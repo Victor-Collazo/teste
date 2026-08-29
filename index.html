@@ -1,5 +1,5 @@
 <title>Controle de Alunos — Consultoria Online</title>
-<meta name="description" content="Controle de alunos, protocolos de treino de 45 dias e previsão de término de plano, com ajuste automático por atraso.">
+<meta name="description" content="Controle de alunos, protocolos de treino de 45 dias, previsão de término de plano e acompanhamento em CRM por espaço de trabalho.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
@@ -74,6 +74,26 @@
     --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
   }
 
+  /* Per-workspace accent: Victor keeps the default blue, Gabi's space gets its own hue
+     so the two are visually unmistakable at a glance. */
+  body[data-workspace="gabi"] {
+    --accent: #A2436B;
+    --accent-ink: #FFFFFF;
+    --accent-bg: #F6E4EC;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) body[data-workspace="gabi"] {
+      --accent: #D98FB0;
+      --accent-ink: #2A1420;
+      --accent-bg: #3A2430;
+    }
+  }
+  :root[data-theme="dark"] body[data-workspace="gabi"] {
+    --accent: #D98FB0;
+    --accent-ink: #2A1420;
+    --accent-bg: #3A2430;
+  }
+
   * { box-sizing: border-box; }
 
   body {
@@ -93,7 +113,7 @@
     justify-content: space-between;
     align-items: flex-end;
     gap: 16px;
-    margin-bottom: 28px;
+    margin-bottom: 20px;
   }
 
   .eyebrow {
@@ -103,6 +123,7 @@
     font-weight: 700;
     color: var(--accent);
     margin: 0 0 4px;
+    transition: color 0.15s ease;
   }
 
   h1 {
@@ -116,6 +137,31 @@
     text-transform: uppercase;
   }
 
+  .top-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+  .workspace-switch {
+    display: inline-flex;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 3px;
+    gap: 3px;
+  }
+  .ws-btn {
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 13px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .ws-btn.active { background: var(--accent); color: var(--accent-ink); }
+  .ws-btn:hover:not(.active) { color: var(--ink); }
+
   .btn {
     font-family: inherit;
     font-weight: 700;
@@ -127,7 +173,7 @@
     background: var(--accent);
     color: var(--accent-ink);
     box-shadow: var(--shadow);
-    transition: transform 0.1s ease, filter 0.15s ease;
+    transition: transform 0.1s ease, filter 0.15s ease, background 0.15s ease;
   }
   .btn:hover { filter: brightness(1.08); }
   .btn:active { transform: translateY(1px); }
@@ -154,6 +200,28 @@
     border: 1px solid var(--good);
     box-shadow: none;
   }
+
+  .subtabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+  .subtab-btn {
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 14px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    padding: 10px 4px;
+    margin-right: 22px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .subtab-btn.active { color: var(--ink); border-bottom-color: var(--accent); }
+  .subtab-btn:hover { color: var(--ink); }
 
   .stats {
     display: grid;
@@ -317,6 +385,73 @@
   .chip.danger { background: var(--danger-bg); color: var(--danger); }
   .chip.neutral { background: var(--neutral-bg); color: var(--neutral); }
 
+  .kanban-intro { color: var(--muted); font-size: 13px; margin: 0 0 16px; max-width: 62ch; }
+
+  .kanban-board {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    align-items: flex-start;
+  }
+  .kanban-col {
+    flex: 0 0 260px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 140px;
+    outline: 2px solid transparent;
+    outline-offset: -2px;
+    transition: outline-color 0.15s ease, background 0.15s ease;
+  }
+  .kanban-col.drag-over { outline-color: var(--accent); background: var(--accent-bg); }
+  .kanban-col-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    font-size: 13.5px;
+  }
+  .kanban-count {
+    background: var(--surface-2);
+    color: var(--muted);
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 1px 8px;
+    border-radius: 999px;
+  }
+  .kanban-cards { display: flex; flex-direction: column; gap: 10px; min-height: 40px; }
+  .kanban-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    cursor: grab;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .kanban-card.dragging { opacity: 0.5; }
+  .kc-name { font-weight: 700; font-size: 13.5px; }
+  .kc-badges { display: flex; gap: 5px; flex-wrap: wrap; }
+  .kc-move { display: flex; flex-direction: column; gap: 3px; }
+  .kc-move select {
+    width: 100%;
+    padding: 6px 8px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 12.5px;
+  }
+  .kanban-empty { color: var(--muted); font-size: 12.5px; text-align: center; padding: 14px 0; }
+
   dialog.appDialog {
     border: none;
     border-radius: 16px;
@@ -365,31 +500,49 @@
 
 <header class="top">
   <div>
-    <p class="eyebrow">Gestão de alunos</p>
+    <p class="eyebrow" id="eyebrow">Gestão de alunos</p>
     <h1>Controle de Alunos Consultoria Online</h1>
   </div>
-  <button class="btn" id="openAdd">+ Adicionar aluno</button>
+  <div class="top-actions">
+    <div class="workspace-switch" id="workspaceSwitch">
+      <button type="button" class="ws-btn" data-workspace="victor">Victor</button>
+      <button type="button" class="ws-btn" data-workspace="gabi">Gabi</button>
+    </div>
+    <button class="btn" id="openAdd">+ Adicionar aluno</button>
+  </div>
 </header>
 
-<section class="stats" id="stats"></section>
+<nav class="subtabs" id="subtabs">
+  <button type="button" class="subtab-btn" data-tab="alunos">Alunos</button>
+  <button type="button" class="subtab-btn" data-tab="kanban">Acompanhamento</button>
+</nav>
 
-<div class="toolbar">
-  <input type="search" id="search" placeholder="Buscar aluno…">
-  <select id="filterProduct">
-    <option value="all">Todos os produtos</option>
-    <option value="treino">Minha Consultoria (treino)</option>
-    <option value="premium">Consultoria Premium (treino e dieta)</option>
-  </select>
-  <select id="sortBy">
-    <option value="urgency">Ordenar: mais urgente primeiro</option>
-    <option value="name">Ordenar: nome (A–Z)</option>
-    <option value="start">Ordenar: início mais recente</option>
-  </select>
-</div>
+<section id="viewAlunos">
+  <section class="stats" id="stats"></section>
 
-<div id="listWrap"></div>
+  <div class="toolbar">
+    <input type="search" id="search" placeholder="Buscar aluno…">
+    <select id="filterProduct">
+      <option value="all">Todos os produtos</option>
+      <option value="treino">Minha Consultoria (treino)</option>
+      <option value="premium">Consultoria Premium (treino e dieta)</option>
+    </select>
+    <select id="sortBy">
+      <option value="urgency">Ordenar: mais urgente primeiro</option>
+      <option value="name">Ordenar: nome (A–Z)</option>
+      <option value="start">Ordenar: início mais recente</option>
+    </select>
+  </div>
 
-<footer class="note">Os dados ficam salvos apenas neste navegador (armazenamento local).</footer>
+  <div id="listWrap"></div>
+</section>
+
+<section id="viewKanban" hidden>
+  <p class="kanban-intro">Arraste os cards entre as colunas para atualizar a etapa de cada aluno. Em telas sem suporte a arrastar (celular/tablet), use o menu "Mover para" dentro do card.</p>
+  <div class="kanban-board" id="kanbanBoard"></div>
+</section>
+
+<footer class="note">Cada espaço (Victor / Gabi) guarda seus próprios dados, separadamente, neste navegador. Não há senha — é só uma forma de organizar sem misturar os alunos de cada um.</footer>
 
 <dialog class="appDialog" id="formDialog">
   <div class="dialog-inner">
@@ -457,9 +610,16 @@
 <script>
 (function () {
   "use strict";
-  var STORAGE_KEY = "protocolTrackerStudentsV2";
+  var STORAGE_PREFIX = "consultoriaOnlineStudents_";
+  var LEGACY_KEY = "protocolTrackerStudentsV2";
+  var UI_STATE_KEY = "consultoriaOnlineUIState";
   var DAY = 86400000;
   var CYCLE = 45;
+
+  var WORKSPACES = {
+    victor: { label: "Victor" },
+    gabi: { label: "Gabi" }
+  };
 
   var PLANS = {
     BASIC: { label: "BASIC", protocols: 1 },
@@ -474,6 +634,14 @@
     treino: { label: "Minha Consultoria", badge: "TREINO", cls: "product-treino" },
     premium: { label: "Consultoria Premium", badge: "TREINO + DIETA", cls: "product-premium" }
   };
+
+  var STAGES = [
+    { key: "onboarding", label: "Onboarding" },
+    { key: "ativo", label: "Ativo" },
+    { key: "atencao", label: "Atenção" },
+    { key: "renovacao", label: "Renovação" },
+    { key: "encerrado", label: "Encerrado" }
+  ];
 
   function todayStart() {
     var d = new Date();
@@ -507,19 +675,53 @@
     return Math.round((b - a) / DAY);
   }
 
-  function load() {
+  function escapeHtml(str) {
+    var d = document.createElement("div");
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  function migrateLegacyData() {
+    var victorKey = STORAGE_PREFIX + "victor";
+    if (!localStorage.getItem(victorKey)) {
+      var legacy = localStorage.getItem(LEGACY_KEY);
+      if (legacy) localStorage.setItem(victorKey, legacy);
+    }
+  }
+
+  function loadStudents(workspaceId) {
     try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      return JSON.parse(localStorage.getItem(STORAGE_PREFIX + workspaceId)) || [];
     } catch (e) {
       return [];
     }
   }
 
-  function save(list) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  function saveStudents(workspaceId, list) {
+    localStorage.setItem(STORAGE_PREFIX + workspaceId, JSON.stringify(list));
   }
 
-  var students = load();
+  function loadUIState() {
+    try {
+      return JSON.parse(localStorage.getItem(UI_STATE_KEY)) || {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveUIState(state) {
+    localStorage.setItem(UI_STATE_KEY, JSON.stringify(state));
+  }
+
+  migrateLegacyData();
+  var uiState = loadUIState();
+  var currentWorkspace = uiState.workspace === "gabi" ? "gabi" : "victor";
+  var currentTab = uiState.tab === "kanban" ? "kanban" : "alunos";
+  var students = loadStudents(currentWorkspace);
+
+  function persist() {
+    saveStudents(currentWorkspace, students);
+  }
 
   function populatePlanSelect(selectEl) {
     selectEl.innerHTML = PLAN_ORDER.map(function (key) {
@@ -602,12 +804,6 @@
       '<div class="stat warn"><div class="num mono">' + trocaBreve + '</div><div class="label">Trocam de treino em breve</div></div>' +
       '<div class="stat danger"><div class="num mono">' + atrasados + '</div><div class="label">Atrasados para trocar treino</div></div>' +
       '<div class="stat neutral"><div class="num mono">' + concluidos + '</div><div class="label">Planos concluídos</div></div>';
-  }
-
-  function escapeHtml(str) {
-    var d = document.createElement("div");
-    d.textContent = str;
-    return d.innerHTML;
   }
 
   function render() {
@@ -705,6 +901,135 @@
     wrap.innerHTML = html;
   }
 
+  function moveStudentToStage(id, stageKey) {
+    students = students.map(function (s) {
+      return s.id === id ? Object.assign({}, s, { stage: stageKey }) : s;
+    });
+    persist();
+    renderKanban();
+  }
+
+  function renderKanban() {
+    var board = document.getElementById("kanbanBoard");
+    if (students.length === 0) {
+      board.innerHTML = '<div class="empty"><strong>Nenhum aluno cadastrado ainda</strong>Adicione um aluno na aba "Alunos" para vê-lo aqui.</div>';
+      return;
+    }
+    board.innerHTML = STAGES.map(function (stage) {
+      var list = students.filter(function (s) { return (s.stage || "ativo") === stage.key; });
+      var cardsHtml = list.map(function (s) {
+        var st = computeStatus(s);
+        var plan = PLANS[s.plan] || PLANS.BASIC;
+        var product = PRODUCTS[s.product] || PRODUCTS.treino;
+        var options = STAGES.map(function (opt) {
+          return '<option value="' + opt.key + '"' + (opt.key === stage.key ? ' selected' : '') + '>' + opt.label + '</option>';
+        }).join("");
+        return '<div class="kanban-card" draggable="true" data-id="' + s.id + '">' +
+          '<div class="kc-name">' + escapeHtml(s.name) + '</div>' +
+          '<div class="kc-badges">' +
+            '<span class="badge plan">' + plan.label + '</span>' +
+            '<span class="badge ' + product.cls + '">' + product.badge + '</span>' +
+          '</div>' +
+          '<span class="chip ' + st.state + '">' + st.label + '</span>' +
+          '<label class="kc-move">' +
+            '<span class="field-label">Mover para</span>' +
+            '<select class="kc-move-select" data-id="' + s.id + '">' + options + '</select>' +
+          '</label>' +
+        '</div>';
+      }).join("");
+      return '<div class="kanban-col" data-stage="' + stage.key + '">' +
+        '<div class="kanban-col-head"><span>' + stage.label + '</span><span class="kanban-count">' + list.length + '</span></div>' +
+        '<div class="kanban-cards">' + (cardsHtml || '<div class="kanban-empty">Sem alunos aqui</div>') + '</div>' +
+      '</div>';
+    }).join("");
+  }
+
+  function applyWorkspaceUI() {
+    document.body.setAttribute("data-workspace", currentWorkspace);
+    document.querySelectorAll(".ws-btn").forEach(function (btn) {
+      btn.classList.toggle("active", btn.getAttribute("data-workspace") === currentWorkspace);
+    });
+    var label = WORKSPACES[currentWorkspace].label;
+    document.getElementById("eyebrow").textContent = "Gestão de alunos — espaço de " + label;
+    document.title = "Consultoria Online — " + label;
+  }
+
+  function applyTabUI() {
+    document.querySelectorAll(".subtab-btn").forEach(function (btn) {
+      btn.classList.toggle("active", btn.getAttribute("data-tab") === currentTab);
+    });
+    document.getElementById("viewAlunos").hidden = currentTab !== "alunos";
+    document.getElementById("viewKanban").hidden = currentTab !== "kanban";
+  }
+
+  function switchWorkspace(id) {
+    if (id === currentWorkspace || !WORKSPACES[id]) return;
+    currentWorkspace = id;
+    students = loadStudents(currentWorkspace);
+    uiState.workspace = id;
+    saveUIState(uiState);
+    applyWorkspaceUI();
+    render();
+    renderKanban();
+  }
+
+  function switchTab(tab) {
+    if (tab === currentTab) return;
+    currentTab = tab;
+    uiState.tab = tab;
+    saveUIState(uiState);
+    applyTabUI();
+    if (tab === "kanban") renderKanban();
+  }
+
+  document.getElementById("workspaceSwitch").addEventListener("click", function (e) {
+    var btn = e.target.closest(".ws-btn");
+    if (!btn) return;
+    switchWorkspace(btn.getAttribute("data-workspace"));
+  });
+
+  document.getElementById("subtabs").addEventListener("click", function (e) {
+    var btn = e.target.closest(".subtab-btn");
+    if (!btn) return;
+    switchTab(btn.getAttribute("data-tab"));
+  });
+
+  var kanbanBoard = document.getElementById("kanbanBoard");
+  kanbanBoard.addEventListener("dragstart", function (e) {
+    var card = e.target.closest(".kanban-card");
+    if (!card) return;
+    e.dataTransfer.setData("text/plain", card.getAttribute("data-id"));
+    e.dataTransfer.effectAllowed = "move";
+    card.classList.add("dragging");
+  });
+  kanbanBoard.addEventListener("dragend", function (e) {
+    var card = e.target.closest(".kanban-card");
+    if (card) card.classList.remove("dragging");
+  });
+  kanbanBoard.addEventListener("dragover", function (e) {
+    var col = e.target.closest(".kanban-col");
+    if (!col) return;
+    e.preventDefault();
+    col.classList.add("drag-over");
+  });
+  kanbanBoard.addEventListener("dragleave", function (e) {
+    var col = e.target.closest(".kanban-col");
+    if (col && !col.contains(e.relatedTarget)) col.classList.remove("drag-over");
+  });
+  kanbanBoard.addEventListener("drop", function (e) {
+    var col = e.target.closest(".kanban-col");
+    if (!col) return;
+    e.preventDefault();
+    col.classList.remove("drag-over");
+    var id = e.dataTransfer.getData("text/plain");
+    if (id) moveStudentToStage(id, col.getAttribute("data-stage"));
+  });
+  kanbanBoard.addEventListener("change", function (e) {
+    var sel = e.target.closest(".kc-move-select");
+    if (!sel) return;
+    moveStudentToStage(sel.getAttribute("data-id"), sel.value);
+  });
+
   var dialog = document.getElementById("formDialog");
   var form = document.getElementById("studentForm");
   var planSelect = document.getElementById("fPlan");
@@ -750,6 +1075,7 @@
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     var id = document.getElementById("editId").value;
+    var existing = id ? students.find(function (s) { return s.id === id; }) : null;
     var record = {
       id: id || String(Date.now()),
       name: document.getElementById("fName").value.trim(),
@@ -757,7 +1083,8 @@
       plan: planSelect.value,
       start: startInput.value,
       protocolNumber: Math.max(1, parseInt(protocolNumberInput.value, 10) || 1),
-      protocolStart: protocolStartInput.value
+      protocolStart: protocolStartInput.value,
+      stage: existing ? (existing.stage || "onboarding") : "onboarding"
     };
 
     if (id) {
@@ -765,9 +1092,10 @@
     } else {
       students.push(record);
     }
-    save(students);
+    persist();
     dialog.close();
     render();
+    if (currentTab === "kanban") renderKanban();
   });
 
   document.getElementById("listWrap").addEventListener("click", function (e) {
@@ -779,7 +1107,7 @@
     if (action === "delete") {
       if (confirm("Excluir este aluno da lista?")) {
         students = students.filter(function (s) { return s.id !== id; });
-        save(students);
+        persist();
         render();
       }
     } else if (action === "edit") {
@@ -822,15 +1150,19 @@
         protocolStart: date
       });
     });
-    save(students);
+    persist();
     document.getElementById("swapDialog").close();
     render();
+    if (currentTab === "kanban") renderKanban();
   });
 
   document.getElementById("search").addEventListener("input", render);
   document.getElementById("filterProduct").addEventListener("change", render);
   document.getElementById("sortBy").addEventListener("change", render);
 
+  applyWorkspaceUI();
+  applyTabUI();
   render();
+  renderKanban();
 })();
 </script>
