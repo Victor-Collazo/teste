@@ -1,5 +1,5 @@
-<title>Painel de Protocolos</title>
-<meta name="description" content="Controle de alunos, protocolos de treino e vencimento de planos de consultoria.">
+<title>Controle de Alunos — Consultoria Online</title>
+<meta name="description" content="Controle de alunos, protocolos de treino de 45 dias e previsão de término de plano, com ajuste automático por atraso.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
@@ -12,12 +12,17 @@
     --border: #D6DBD5;
     --accent: #3B5BA5;
     --accent-ink: #FFFFFF;
+    --accent-bg: #E7ECF7;
+    --premium: #9B5B2C;
+    --premium-bg: #F6E9DC;
     --good: #1E8F72;
     --good-bg: #E1F2EB;
     --warn: #C97A2B;
     --warn-bg: #FBEADA;
     --danger: #C1443A;
     --danger-bg: #FAE4E1;
+    --neutral: #6C6F63;
+    --neutral-bg: #E7E8E2;
     --shadow: 0 1px 2px rgba(20,30,25,0.06), 0 8px 24px -12px rgba(20,30,25,0.18);
   }
 
@@ -31,12 +36,17 @@
       --border: #333B3A;
       --accent: #8098D9;
       --accent-ink: #10131A;
+      --accent-bg: #222B41;
+      --premium: #D69A61;
+      --premium-bg: #3A2A18;
       --good: #4FBE95;
       --good-bg: #16332A;
       --warn: #E0A052;
       --warn-bg: #3A2C15;
       --danger: #E2695F;
       --danger-bg: #3A1F1C;
+      --neutral: #9AA39C;
+      --neutral-bg: #262C28;
       --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
     }
   }
@@ -50,12 +60,17 @@
     --border: #333B3A;
     --accent: #8098D9;
     --accent-ink: #10131A;
+    --accent-bg: #222B41;
+    --premium: #D69A61;
+    --premium-bg: #3A2A18;
     --good: #4FBE95;
     --good-bg: #16332A;
     --warn: #E0A052;
     --warn-bg: #3A2C15;
     --danger: #E2695F;
     --danger-bg: #3A1F1C;
+    --neutral: #9AA39C;
+    --neutral-bg: #262C28;
     --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
   }
 
@@ -93,11 +108,12 @@
   h1 {
     font-family: 'Big Shoulders Display', ui-sans-serif, sans-serif;
     font-weight: 800;
-    font-size: clamp(32px, 5vw, 46px);
+    font-size: clamp(26px, 4.2vw, 40px);
     letter-spacing: 0.01em;
-    line-height: 0.95;
+    line-height: 0.98;
     margin: 0;
     text-wrap: balance;
+    text-transform: uppercase;
   }
 
   .btn {
@@ -132,6 +148,12 @@
     border: 1px solid var(--danger);
     box-shadow: none;
   }
+  .btn.good-outline {
+    background: transparent;
+    color: var(--good);
+    border: 1px solid var(--good);
+    box-shadow: none;
+  }
 
   .stats {
     display: grid;
@@ -161,6 +183,7 @@
   .stat.good .num { color: var(--good); }
   .stat.warn .num { color: var(--warn); }
   .stat.danger .num { color: var(--danger); }
+  .stat.neutral .num { color: var(--neutral); }
 
   .toolbar {
     display: flex;
@@ -200,38 +223,76 @@
   }
   .empty strong { color: var(--ink); display: block; font-size: 18px; margin-bottom: 6px; }
 
-  .cards { display: flex; flex-direction: column; gap: 10px; }
+  .cards { display: flex; flex-direction: column; gap: 12px; }
 
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 14px;
-    padding: 16px 18px;
+    padding: 16px 18px 18px;
     box-shadow: var(--shadow);
-    display: grid;
-    grid-template-columns: 1.4fr 1fr 1fr 1fr auto;
+    display: flex;
+    flex-direction: column;
     gap: 14px;
+  }
+
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .card-head .name { font-weight: 700; font-size: 17px; }
+  .card-head .start-date { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+  .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .badge {
+    display: inline-flex;
     align-items: center;
+    padding: 3px 9px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    border: 1px solid transparent;
   }
-  @media (max-width: 860px) {
-    .card { grid-template-columns: 1fr 1fr; }
-    .card .col-actions { grid-column: 1 / -1; justify-content: flex-start; }
+  .badge.plan { background: var(--accent-bg); color: var(--accent); }
+  .badge.product-treino { background: var(--neutral-bg); color: var(--neutral); }
+  .badge.product-premium { background: var(--premium-bg); color: var(--premium); }
+
+  .card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  @media (max-width: 760px) {
+    .meta-grid { grid-template-columns: repeat(2, 1fr); }
   }
 
-  .col-name .name { font-weight: 700; font-size: 16px; }
-  .col-name .plan { color: var(--muted); font-size: 13px; margin-top: 2px; }
-
-  .col label, .field-label {
+  .meta .field-label {
     display: block;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     font-size: 10.5px;
     font-weight: 700;
     color: var(--muted);
-    margin-bottom: 3px;
+    margin-bottom: 5px;
   }
-  .col .value { font-size: 14px; }
-  .col .sub { font-size: 12px; color: var(--muted); }
+  .meta .value { font-size: 14px; font-weight: 600; }
+  .meta .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .progress-track {
+    height: 6px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    overflow: hidden;
+    margin-top: 6px;
+  }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 999px; }
 
   .chip {
     display: inline-flex;
@@ -249,14 +310,14 @@
     height: 6px;
     border-radius: 50%;
     background: currentColor;
+    flex-shrink: 0;
   }
   .chip.good { background: var(--good-bg); color: var(--good); }
   .chip.warn { background: var(--warn-bg); color: var(--warn); }
   .chip.danger { background: var(--danger-bg); color: var(--danger); }
+  .chip.neutral { background: var(--neutral-bg); color: var(--neutral); }
 
-  .col-actions { display: flex; gap: 8px; justify-content: flex-end; }
-
-  dialog#formDialog {
+  dialog.appDialog {
     border: none;
     border-radius: 16px;
     padding: 0;
@@ -265,15 +326,16 @@
     box-shadow: var(--shadow);
     width: min(520px, 92vw);
   }
-  dialog#formDialog::backdrop { background: rgba(10, 14, 12, 0.45); }
+  dialog.appDialog::backdrop { background: rgba(10, 14, 12, 0.45); }
 
   .dialog-inner { padding: 26px 26px 22px; }
   .dialog-inner h2 {
     font-family: 'Big Shoulders Display', sans-serif;
     font-weight: 700;
-    font-size: 26px;
-    margin: 0 0 18px;
+    font-size: 24px;
+    margin: 0 0 6px;
   }
+  .dialog-inner p.hint { color: var(--muted); font-size: 13px; margin: 0 0 18px; }
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .form-grid .full { grid-column: 1 / -1; }
   .form-grid input, .form-grid select {
@@ -303,8 +365,8 @@
 
 <header class="top">
   <div>
-    <p class="eyebrow">Consultoria &middot; Acompanhamento</p>
-    <h1>Painel de Protocolos</h1>
+    <p class="eyebrow">Gestão de alunos</p>
+    <h1>Controle de Alunos Consultoria Online</h1>
   </div>
   <button class="btn" id="openAdd">+ Adicionar aluno</button>
 </header>
@@ -312,7 +374,12 @@
 <section class="stats" id="stats"></section>
 
 <div class="toolbar">
-  <input type="search" id="search" placeholder="Buscar aluno ou plano…">
+  <input type="search" id="search" placeholder="Buscar aluno…">
+  <select id="filterProduct">
+    <option value="all">Todos os produtos</option>
+    <option value="treino">Minha Consultoria (treino)</option>
+    <option value="premium">Consultoria Premium (treino e dieta)</option>
+  </select>
   <select id="sortBy">
     <option value="urgency">Ordenar: mais urgente primeiro</option>
     <option value="name">Ordenar: nome (A–Z)</option>
@@ -322,9 +389,9 @@
 
 <div id="listWrap"></div>
 
-<footer class="note">Os dados ficam salvos apenas neste navegador (armazenamento local). Use exportar/importar para levar para outro dispositivo.</footer>
+<footer class="note">Os dados ficam salvos apenas neste navegador (armazenamento local).</footer>
 
-<dialog id="formDialog">
+<dialog class="appDialog" id="formDialog">
   <div class="dialog-inner">
     <h2 id="dialogTitle">Adicionar aluno</h2>
     <form id="studentForm">
@@ -335,29 +402,30 @@
           <input id="fName" required placeholder="Ex.: Marina Souza">
         </div>
         <div class="full">
+          <label class="field-label" for="fProduct">Produto</label>
+          <select id="fProduct">
+            <option value="treino">Minha Consultoria (treino)</option>
+            <option value="premium">Consultoria Premium (treino e dieta)</option>
+          </select>
+        </div>
+        <div class="full">
           <label class="field-label" for="fPlan">Plano contratado</label>
-          <input id="fPlan" required placeholder="Ex.: Consultoria Trimestral">
+          <select id="fPlan"></select>
         </div>
         <div>
           <label class="field-label" for="fStart">Início do plano</label>
           <input id="fStart" type="date" required>
         </div>
         <div>
-          <label class="field-label" for="fDuration">Duração do plano</label>
-          <select id="fDuration">
-            <option value="45">45 dias (1 protocolo)</option>
-            <option value="90" selected>90 dias (2 protocolos)</option>
-            <option value="135">135 dias (3 protocolos)</option>
-            <option value="180">180 dias (4 protocolos)</option>
-            <option value="365">365 dias (1 ano)</option>
-            <option value="custom">Personalizado…</option>
-          </select>
+          <label class="field-label" for="fProtocolNumber">Protocolo atual</label>
+          <input id="fProtocolNumber" type="number" min="1" value="1" required>
         </div>
-        <div class="full" id="customDaysWrap" style="display:none;">
-          <label class="field-label" for="fCustomDays">Duração personalizada (dias)</label>
-          <input id="fCustomDays" type="number" min="1" placeholder="Ex.: 60">
+        <div class="full">
+          <label class="field-label" for="fProtocolStart">Início do protocolo atual</label>
+          <input id="fProtocolStart" type="date" required>
         </div>
       </div>
+      <p class="hint" style="margin-top:14px;">Para um aluno novo, deixe "protocolo atual" como 1 e a mesma data de início. Se o aluno já estiver no meio do plano, ajuste os dois campos acima.</p>
       <div class="dialog-actions">
         <button type="button" class="btn ghost" id="cancelForm">Cancelar</button>
         <button type="submit" class="btn" id="submitForm">Salvar</button>
@@ -366,11 +434,46 @@
   </div>
 </dialog>
 
+<dialog class="appDialog" id="swapDialog">
+  <div class="dialog-inner">
+    <h2 id="swapTitle">Confirmar troca de treino</h2>
+    <p class="hint">Informe a data em que o novo treino realmente começou a valer. Isso ajusta a previsão de término do plano com base no atraso real.</p>
+    <form id="swapForm">
+      <input type="hidden" id="swapId">
+      <div class="form-grid">
+        <div class="full">
+          <label class="field-label" for="swapDate">Data da troca</label>
+          <input id="swapDate" type="date" required>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="btn ghost" id="cancelSwap">Cancelar</button>
+        <button type="submit" class="btn" id="submitSwap">Confirmar</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
 <script>
 (function () {
   "use strict";
-  var STORAGE_KEY = "protocolTrackerStudents";
+  var STORAGE_KEY = "protocolTrackerStudentsV2";
   var DAY = 86400000;
+  var CYCLE = 45;
+
+  var PLANS = {
+    BASIC: { label: "BASIC", protocols: 1 },
+    PLUS: { label: "PLUS", protocols: 2 },
+    ADVANCED: { label: "ADVANCED", protocols: 3 },
+    ELITE: { label: "ELITE", protocols: 6 },
+    DIAMOND: { label: "DIAMOND", protocols: 12 }
+  };
+  var PLAN_ORDER = ["BASIC", "PLUS", "ADVANCED", "ELITE", "DIAMOND"];
+
+  var PRODUCTS = {
+    treino: { label: "Minha Consultoria", badge: "TREINO", cls: "product-treino" },
+    premium: { label: "Consultoria Premium", badge: "TREINO + DIETA", cls: "product-premium" }
+  };
 
   function todayStart() {
     var d = new Date();
@@ -381,6 +484,13 @@
   function parseDate(str) {
     var parts = str.split("-").map(Number);
     return new Date(parts[0], parts[1] - 1, parts[2]);
+  }
+
+  function toInputValue(date) {
+    var y = date.getFullYear();
+    var m = String(date.getMonth() + 1).padStart(2, "0");
+    var d = String(date.getDate()).padStart(2, "0");
+    return y + "-" + m + "-" + d;
   }
 
   function addDays(date, days) {
@@ -405,77 +515,68 @@
     }
   }
 
-  function save(students) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
+  function save(list) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
   }
 
   var students = load();
 
+  function populatePlanSelect(selectEl) {
+    selectEl.innerHTML = PLAN_ORDER.map(function (key) {
+      var p = PLANS[key];
+      return '<option value="' + key + '">' + p.label + ' (' + p.protocols + (p.protocols === 1 ? ' protocolo' : ' protocolos') + ')</option>';
+    }).join("");
+  }
+
   function computeStatus(student) {
-    var start = parseDate(student.start);
+    var plan = PLANS[student.plan] || PLANS.BASIC;
+    var totalProtocols = plan.protocols;
+    var protocolStart = parseDate(student.protocolStart);
     var today = todayStart();
-    var expiry = addDays(start, student.durationDays);
-    var elapsed = Math.max(0, daysBetween(start, today));
-    var cycle = 45;
-    var protocolNumber = Math.min(
-      Math.ceil(student.durationDays / cycle),
-      Math.floor(elapsed / cycle) + 1
-    );
-    var nextSwap = addDays(start, protocolNumber * cycle);
-    while (nextSwap <= today && nextSwap < expiry) {
-      protocolNumber += 1;
-      nextSwap = addDays(start, protocolNumber * cycle);
-    }
-    var swapIsPastExpiry = nextSwap >= expiry;
-    var daysToExpiry = daysBetween(today, expiry);
-    var daysToSwap = daysBetween(today, nextSwap);
+    var completed = student.protocolNumber > totalProtocols;
+
+    var nominalSwap = addDays(protocolStart, CYCLE);
+    var daysToSwap = daysBetween(today, nominalSwap);
+    var delayDays = Math.max(0, -daysToSwap);
+
+    var remaining = Math.max(0, totalProtocols - student.protocolNumber + 1);
+    var predictedEnd = addDays(protocolStart, CYCLE * remaining + delayDays);
 
     var state = "good";
     var label = "Ativo";
-    if (daysToExpiry < 0) {
+
+    if (completed) {
+      state = "neutral";
+      label = "Plano concluído";
+    } else if (delayDays > 0) {
       state = "danger";
-      label = "Plano vencido";
-    } else if (daysToExpiry <= 7) {
-      state = "warn";
-      label = "Plano vence em breve";
-    } else if (!swapIsPastExpiry && daysToSwap <= 3) {
+      label = "Atrasado " + delayDays + (delayDays === 1 ? " dia" : " dias");
+    } else if (daysToSwap <= 3) {
       state = "warn";
       label = "Trocar treino em breve";
+    } else if (remaining === 1 && daysBetween(today, predictedEnd) <= 7) {
+      state = "warn";
+      label = "Plano perto do fim";
     }
 
     return {
-      expiry: expiry,
-      nextSwap: nextSwap,
-      swapIsPastExpiry: swapIsPastExpiry,
-      protocolNumber: Math.max(1, protocolNumber),
-      totalProtocols: Math.ceil(student.durationDays / cycle),
-      daysToExpiry: daysToExpiry,
+      totalProtocols: totalProtocols,
+      completed: completed,
+      nominalSwap: nominalSwap,
       daysToSwap: daysToSwap,
+      delayDays: delayDays,
+      predictedEnd: predictedEnd,
+      daysToEnd: daysBetween(today, predictedEnd),
       state: state,
       label: label
     };
   }
 
   function urgencyScore(student) {
-    var s = computeStatus(student);
-    if (s.daysToExpiry < 0) return -10000 + s.daysToExpiry;
-    return Math.min(s.daysToExpiry, s.swapIsPastExpiry ? Infinity : s.daysToSwap);
-  }
-
-  function renderStats(list) {
-    var vencidos = 0, venceSete = 0, trocaBreve = 0;
-    list.forEach(function (s) {
-      var st = computeStatus(s);
-      if (st.daysToExpiry < 0) vencidos++;
-      else if (st.daysToExpiry <= 7) venceSete++;
-      else if (!st.swapIsPastExpiry && st.daysToSwap <= 3) trocaBreve++;
-    });
-    var el = document.getElementById("stats");
-    el.innerHTML =
-      '<div class="stat"><div class="num mono">' + list.length + '</div><div class="label">Alunos ativos</div></div>' +
-      '<div class="stat warn"><div class="num mono">' + trocaBreve + '</div><div class="label">Trocam de treino em breve</div></div>' +
-      '<div class="stat warn"><div class="num mono">' + venceSete + '</div><div class="label">Planos vencendo em 7 dias</div></div>' +
-      '<div class="stat danger"><div class="num mono">' + vencidos + '</div><div class="label">Planos vencidos</div></div>';
+    var st = computeStatus(student);
+    if (st.completed) return 100000;
+    if (st.delayDays > 0) return -10000 - st.delayDays;
+    return Math.min(st.daysToSwap, st.daysToEnd);
   }
 
   function daysLabel(n, futureWord, pastWord) {
@@ -484,12 +585,40 @@
     return Math.abs(n) + (Math.abs(n) === 1 ? " dia" : " dias") + " " + pastWord;
   }
 
+  function renderStats(list) {
+    var trocaBreve = 0, atrasados = 0, concluidos = 0, ativos = 0;
+    list.forEach(function (s) {
+      var st = computeStatus(s);
+      if (st.completed) concluidos++;
+      else {
+        ativos++;
+        if (st.delayDays > 0) atrasados++;
+        else if (st.daysToSwap <= 3) trocaBreve++;
+      }
+    });
+    var el = document.getElementById("stats");
+    el.innerHTML =
+      '<div class="stat"><div class="num mono">' + ativos + '</div><div class="label">Alunos ativos</div></div>' +
+      '<div class="stat warn"><div class="num mono">' + trocaBreve + '</div><div class="label">Trocam de treino em breve</div></div>' +
+      '<div class="stat danger"><div class="num mono">' + atrasados + '</div><div class="label">Atrasados para trocar treino</div></div>' +
+      '<div class="stat neutral"><div class="num mono">' + concluidos + '</div><div class="label">Planos concluídos</div></div>';
+  }
+
+  function escapeHtml(str) {
+    var d = document.createElement("div");
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
   function render() {
     var query = document.getElementById("search").value.trim().toLowerCase();
+    var productFilter = document.getElementById("filterProduct").value;
     var sortBy = document.getElementById("sortBy").value;
 
     var filtered = students.filter(function (s) {
-      return s.name.toLowerCase().indexOf(query) !== -1 || s.plan.toLowerCase().indexOf(query) !== -1;
+      var matchesQuery = s.name.toLowerCase().indexOf(query) !== -1;
+      var matchesProduct = productFilter === "all" || s.product === productFilter;
+      return matchesQuery && matchesProduct;
     });
 
     filtered.sort(function (a, b) {
@@ -513,30 +642,62 @@
     var html = '<div class="cards">';
     filtered.forEach(function (s) {
       var st = computeStatus(s);
-      var chipClass = st.state;
+      var plan = PLANS[s.plan] || PLANS.BASIC;
+      var product = PRODUCTS[s.product] || PRODUCTS.treino;
+      var progressPct = Math.min(100, Math.round(((s.protocolNumber - 1) / st.totalProtocols) * 100));
+
+      var swapCol = st.completed
+        ? '<div class="value">—</div><div class="sub">plano finalizado</div>'
+        : '<div class="value mono">' + fmtDate(st.nominalSwap) + '</div><div class="sub">' +
+          (st.delayDays > 0 ? 'atrasado ' + st.delayDays + (st.delayDays === 1 ? ' dia' : ' dias') : daysLabel(st.daysToSwap, "restantes", "atrás")) +
+          '</div>';
+
+      var endCol = st.completed
+        ? '<div class="value mono">' + fmtDate(st.predictedEnd) + '</div><div class="sub">concluído</div>'
+        : '<div class="value mono">' + fmtDate(st.predictedEnd) + '</div><div class="sub">' +
+          (st.delayDays > 0 ? 'previsão ajustada pelo atraso' : daysLabel(st.daysToEnd, "restantes", "atrás")) +
+          '</div>';
+
+      var actionBtn = st.completed
+        ? ''
+        : '<button class="btn small good-outline" data-action="swap" data-id="' + s.id + '">' +
+          (s.protocolNumber >= st.totalProtocols ? 'Concluir plano hoje' : 'Treino trocado hoje') +
+          '</button>';
+
       html += '<div class="card" data-id="' + s.id + '">' +
-        '<div class="col col-name">' +
-          '<div class="name">' + escapeHtml(s.name) + '</div>' +
-          '<div class="plan">' + escapeHtml(s.plan) + ' &middot; início ' + fmtDate(parseDate(s.start)) + '</div>' +
+        '<div class="card-head">' +
+          '<div>' +
+            '<div class="name">' + escapeHtml(s.name) + '</div>' +
+            '<div class="start-date">Início do plano: ' + fmtDate(parseDate(s.start)) + '</div>' +
+            '<div class="badges">' +
+              '<span class="badge plan">' + plan.label + '</span>' +
+              '<span class="badge ' + product.cls + '">' + product.badge + '</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="card-actions">' +
+            actionBtn +
+            '<button class="btn small ghost" data-action="edit" data-id="' + s.id + '">Editar</button>' +
+            '<button class="btn small danger-outline" data-action="delete" data-id="' + s.id + '">Excluir</button>' +
+          '</div>' +
         '</div>' +
-        '<div class="col">' +
-          '<span class="field-label">Troca de treino</span>' +
-          (st.swapIsPastExpiry
-            ? '<div class="value sub">— (fora do plano)</div>'
-            : '<div class="value mono">' + fmtDate(st.nextSwap) + '</div><div class="sub">' + daysLabel(st.daysToSwap, "restantes", "atrás") + ' &middot; protocolo ' + st.protocolNumber + '/' + st.totalProtocols + '</div>') +
-        '</div>' +
-        '<div class="col">' +
-          '<span class="field-label">Vencimento do plano</span>' +
-          '<div class="value mono">' + fmtDate(st.expiry) + '</div>' +
-          '<div class="sub">' + daysLabel(st.daysToExpiry, "restantes", "atrás") + '</div>' +
-        '</div>' +
-        '<div class="col">' +
-          '<span class="field-label">Status</span>' +
-          '<span class="chip ' + chipClass + '">' + st.label + '</span>' +
-        '</div>' +
-        '<div class="col col-actions">' +
-          '<button class="btn small ghost" data-action="edit" data-id="' + s.id + '">Editar</button>' +
-          '<button class="btn small danger-outline" data-action="delete" data-id="' + s.id + '">Excluir</button>' +
+        '<div class="meta-grid">' +
+          '<div class="meta">' +
+            '<span class="field-label">Protocolo atual</span>' +
+            '<div class="value">' + Math.min(s.protocolNumber, st.totalProtocols) + ' de ' + st.totalProtocols + '</div>' +
+            '<div class="progress-track"><div class="progress-fill" style="width:' + progressPct + '%"></div></div>' +
+          '</div>' +
+          '<div class="meta">' +
+            '<span class="field-label">Próxima troca de treino</span>' +
+            swapCol +
+          '</div>' +
+          '<div class="meta">' +
+            '<span class="field-label">Previsão de término do plano</span>' +
+            endCol +
+          '</div>' +
+          '<div class="meta">' +
+            '<span class="field-label">Status</span>' +
+            '<span class="chip ' + st.state + '">' + st.label + '</span>' +
+          '</div>' +
         '</div>' +
       '</div>';
     });
@@ -544,53 +705,59 @@
     wrap.innerHTML = html;
   }
 
-  function escapeHtml(str) {
-    var d = document.createElement("div");
-    d.textContent = str;
-    return d.innerHTML;
-  }
-
   var dialog = document.getElementById("formDialog");
   var form = document.getElementById("studentForm");
-  var durationSelect = document.getElementById("fDuration");
-  var customWrap = document.getElementById("customDaysWrap");
+  var planSelect = document.getElementById("fPlan");
+  var protocolNumberInput = document.getElementById("fProtocolNumber");
+  var startInput = document.getElementById("fStart");
+  var protocolStartInput = document.getElementById("fProtocolStart");
 
-  function openDialog(editing) {
-    document.getElementById("dialogTitle").textContent = editing ? "Editar aluno" : "Adicionar aluno";
-    dialog.showModal();
-  }
+  populatePlanSelect(planSelect);
+
+  planSelect.addEventListener("change", function () {
+    var max = PLANS[planSelect.value].protocols;
+    protocolNumberInput.max = max;
+    if (parseInt(protocolNumberInput.value, 10) > max) protocolNumberInput.value = max;
+  });
+
+  startInput.addEventListener("change", function () {
+    if (!protocolStartInput.dataset.touched) {
+      protocolStartInput.value = startInput.value;
+    }
+  });
+  protocolStartInput.addEventListener("input", function () {
+    protocolStartInput.dataset.touched = "1";
+  });
 
   document.getElementById("openAdd").addEventListener("click", function () {
     form.reset();
     document.getElementById("editId").value = "";
-    document.getElementById("fStart").valueAsDate = todayStart();
-    durationSelect.value = "90";
-    customWrap.style.display = "none";
-    openDialog(false);
+    planSelect.value = "BASIC";
+    protocolNumberInput.value = 1;
+    protocolNumberInput.max = PLANS.BASIC.protocols;
+    delete protocolStartInput.dataset.touched;
+    var today = toInputValue(todayStart());
+    startInput.value = today;
+    protocolStartInput.value = today;
+    document.getElementById("dialogTitle").textContent = "Adicionar aluno";
+    dialog.showModal();
   });
 
   document.getElementById("cancelForm").addEventListener("click", function () {
     dialog.close();
   });
 
-  durationSelect.addEventListener("change", function () {
-    customWrap.style.display = durationSelect.value === "custom" ? "block" : "none";
-  });
-
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     var id = document.getElementById("editId").value;
-    var durationDays = durationSelect.value === "custom"
-      ? parseInt(document.getElementById("fCustomDays").value, 10)
-      : parseInt(durationSelect.value, 10);
-    if (!durationDays || durationDays < 1) durationDays = 45;
-
     var record = {
       id: id || String(Date.now()),
       name: document.getElementById("fName").value.trim(),
-      plan: document.getElementById("fPlan").value.trim(),
-      start: document.getElementById("fStart").value,
-      durationDays: durationDays
+      product: document.getElementById("fProduct").value,
+      plan: planSelect.value,
+      start: startInput.value,
+      protocolNumber: Math.max(1, parseInt(protocolNumberInput.value, 10) || 1),
+      protocolStart: protocolStartInput.value
     };
 
     if (id) {
@@ -607,33 +774,61 @@
     var btn = e.target.closest("button[data-action]");
     if (!btn) return;
     var id = btn.getAttribute("data-id");
-    if (btn.getAttribute("data-action") === "delete") {
+    var action = btn.getAttribute("data-action");
+
+    if (action === "delete") {
       if (confirm("Excluir este aluno da lista?")) {
         students = students.filter(function (s) { return s.id !== id; });
         save(students);
         render();
       }
-    } else if (btn.getAttribute("data-action") === "edit") {
+    } else if (action === "edit") {
       var s = students.find(function (s) { return s.id === id; });
       if (!s) return;
       document.getElementById("editId").value = s.id;
       document.getElementById("fName").value = s.name;
-      document.getElementById("fPlan").value = s.plan;
-      document.getElementById("fStart").value = s.start;
-      var presets = ["45", "90", "135", "180", "365"];
-      if (presets.indexOf(String(s.durationDays)) !== -1) {
-        durationSelect.value = String(s.durationDays);
-        customWrap.style.display = "none";
-      } else {
-        durationSelect.value = "custom";
-        document.getElementById("fCustomDays").value = s.durationDays;
-        customWrap.style.display = "block";
-      }
-      openDialog(true);
+      document.getElementById("fProduct").value = s.product;
+      planSelect.value = s.plan;
+      protocolNumberInput.max = PLANS[s.plan].protocols;
+      startInput.value = s.start;
+      protocolNumberInput.value = s.protocolNumber;
+      protocolStartInput.value = s.protocolStart;
+      protocolStartInput.dataset.touched = "1";
+      document.getElementById("dialogTitle").textContent = "Editar aluno";
+      dialog.showModal();
+    } else if (action === "swap") {
+      var swapDialog = document.getElementById("swapDialog");
+      document.getElementById("swapId").value = id;
+      document.getElementById("swapDate").value = toInputValue(todayStart());
+      var st2 = students.find(function (s) { return s.id === id; });
+      var willComplete = st2 && st2.protocolNumber >= PLANS[st2.plan].protocols;
+      document.getElementById("swapTitle").textContent = willComplete ? "Concluir plano" : "Confirmar troca de treino";
+      swapDialog.showModal();
     }
   });
 
+  document.getElementById("cancelSwap").addEventListener("click", function () {
+    document.getElementById("swapDialog").close();
+  });
+
+  document.getElementById("swapForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var id = document.getElementById("swapId").value;
+    var date = document.getElementById("swapDate").value;
+    students = students.map(function (s) {
+      if (s.id !== id) return s;
+      return Object.assign({}, s, {
+        protocolNumber: s.protocolNumber + 1,
+        protocolStart: date
+      });
+    });
+    save(students);
+    document.getElementById("swapDialog").close();
+    render();
+  });
+
   document.getElementById("search").addEventListener("input", render);
+  document.getElementById("filterProduct").addEventListener("change", render);
   document.getElementById("sortBy").addEventListener("change", render);
 
   render();
