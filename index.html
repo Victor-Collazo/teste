@@ -1,0 +1,641 @@
+<title>Painel de Protocolos</title>
+<meta name="description" content="Controle de alunos, protocolos de treino e vencimento de planos de consultoria.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  :root {
+    --bg: #EEF0EE;
+    --surface: #FFFFFF;
+    --surface-2: #E4E8E4;
+    --ink: #1B2321;
+    --muted: #5B6660;
+    --border: #D6DBD5;
+    --accent: #3B5BA5;
+    --accent-ink: #FFFFFF;
+    --good: #1E8F72;
+    --good-bg: #E1F2EB;
+    --warn: #C97A2B;
+    --warn-bg: #FBEADA;
+    --danger: #C1443A;
+    --danger-bg: #FAE4E1;
+    --shadow: 0 1px 2px rgba(20,30,25,0.06), 0 8px 24px -12px rgba(20,30,25,0.18);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14181A;
+      --surface: #1D2224;
+      --surface-2: #262C2E;
+      --ink: #ECEFEC;
+      --muted: #93A19B;
+      --border: #333B3A;
+      --accent: #8098D9;
+      --accent-ink: #10131A;
+      --good: #4FBE95;
+      --good-bg: #16332A;
+      --warn: #E0A052;
+      --warn-bg: #3A2C15;
+      --danger: #E2695F;
+      --danger-bg: #3A1F1C;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #14181A;
+    --surface: #1D2224;
+    --surface-2: #262C2E;
+    --ink: #ECEFEC;
+    --muted: #93A19B;
+    --border: #333B3A;
+    --accent: #8098D9;
+    --accent-ink: #10131A;
+    --good: #4FBE95;
+    --good-bg: #16332A;
+    --warn: #E0A052;
+    --warn-bg: #3A2C15;
+    --danger: #E2695F;
+    --danger-bg: #3A1F1C;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+    padding: clamp(16px, 4vw, 48px);
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+
+  .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+  header.top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0 0 4px;
+  }
+
+  h1 {
+    font-family: 'Big Shoulders Display', ui-sans-serif, sans-serif;
+    font-weight: 800;
+    font-size: clamp(32px, 5vw, 46px);
+    letter-spacing: 0.01em;
+    line-height: 0.95;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .btn {
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 14px;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 20px;
+    cursor: pointer;
+    background: var(--accent);
+    color: var(--accent-ink);
+    box-shadow: var(--shadow);
+    transition: transform 0.1s ease, filter 0.15s ease;
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .btn:active { transform: translateY(1px); }
+  .btn:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .btn.ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--border);
+    box-shadow: none;
+  }
+  .btn.small { padding: 7px 12px; font-size: 12.5px; border-radius: 8px; }
+  .btn.danger-outline {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    box-shadow: none;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+  }
+  .stat .num {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 700;
+    font-size: 34px;
+    line-height: 1;
+  }
+  .stat .label {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-weight: 600;
+  }
+  .stat.good .num { color: var(--good); }
+  .stat.warn .num { color: var(--warn); }
+  .stat.danger .num { color: var(--danger); }
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .toolbar input[type="search"] {
+    flex: 1;
+    min-width: 180px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 14px;
+  }
+  .toolbar select {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 13.5px;
+  }
+
+  .empty {
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 14px;
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--muted);
+  }
+  .empty strong { color: var(--ink); display: block; font-size: 18px; margin-bottom: 6px; }
+
+  .cards { display: flex; flex-direction: column; gap: 10px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr auto;
+    gap: 14px;
+    align-items: center;
+  }
+  @media (max-width: 860px) {
+    .card { grid-template-columns: 1fr 1fr; }
+    .card .col-actions { grid-column: 1 / -1; justify-content: flex-start; }
+  }
+
+  .col-name .name { font-weight: 700; font-size: 16px; }
+  .col-name .plan { color: var(--muted); font-size: 13px; margin-top: 2px; }
+
+  .col label, .field-label {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+  .col .value { font-size: 14px; }
+  .col .sub { font-size: 12px; color: var(--muted); }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .chip::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .chip.good { background: var(--good-bg); color: var(--good); }
+  .chip.warn { background: var(--warn-bg); color: var(--warn); }
+  .chip.danger { background: var(--danger-bg); color: var(--danger); }
+
+  .col-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+  dialog#formDialog {
+    border: none;
+    border-radius: 16px;
+    padding: 0;
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: var(--shadow);
+    width: min(520px, 92vw);
+  }
+  dialog#formDialog::backdrop { background: rgba(10, 14, 12, 0.45); }
+
+  .dialog-inner { padding: 26px 26px 22px; }
+  .dialog-inner h2 {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    margin: 0 0 18px;
+  }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-grid .full { grid-column: 1 / -1; }
+  .form-grid input, .form-grid select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 9px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 14px;
+  }
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 22px;
+  }
+
+  footer.note {
+    margin-top: 32px;
+    color: var(--muted);
+    font-size: 12.5px;
+    text-align: center;
+  }
+</style>
+
+<header class="top">
+  <div>
+    <p class="eyebrow">Consultoria &middot; Acompanhamento</p>
+    <h1>Painel de Protocolos</h1>
+  </div>
+  <button class="btn" id="openAdd">+ Adicionar aluno</button>
+</header>
+
+<section class="stats" id="stats"></section>
+
+<div class="toolbar">
+  <input type="search" id="search" placeholder="Buscar aluno ou plano…">
+  <select id="sortBy">
+    <option value="urgency">Ordenar: mais urgente primeiro</option>
+    <option value="name">Ordenar: nome (A–Z)</option>
+    <option value="start">Ordenar: início mais recente</option>
+  </select>
+</div>
+
+<div id="listWrap"></div>
+
+<footer class="note">Os dados ficam salvos apenas neste navegador (armazenamento local). Use exportar/importar para levar para outro dispositivo.</footer>
+
+<dialog id="formDialog">
+  <div class="dialog-inner">
+    <h2 id="dialogTitle">Adicionar aluno</h2>
+    <form id="studentForm">
+      <input type="hidden" id="editId">
+      <div class="form-grid">
+        <div class="full">
+          <label class="field-label" for="fName">Nome do aluno</label>
+          <input id="fName" required placeholder="Ex.: Marina Souza">
+        </div>
+        <div class="full">
+          <label class="field-label" for="fPlan">Plano contratado</label>
+          <input id="fPlan" required placeholder="Ex.: Consultoria Trimestral">
+        </div>
+        <div>
+          <label class="field-label" for="fStart">Início do plano</label>
+          <input id="fStart" type="date" required>
+        </div>
+        <div>
+          <label class="field-label" for="fDuration">Duração do plano</label>
+          <select id="fDuration">
+            <option value="45">45 dias (1 protocolo)</option>
+            <option value="90" selected>90 dias (2 protocolos)</option>
+            <option value="135">135 dias (3 protocolos)</option>
+            <option value="180">180 dias (4 protocolos)</option>
+            <option value="365">365 dias (1 ano)</option>
+            <option value="custom">Personalizado…</option>
+          </select>
+        </div>
+        <div class="full" id="customDaysWrap" style="display:none;">
+          <label class="field-label" for="fCustomDays">Duração personalizada (dias)</label>
+          <input id="fCustomDays" type="number" min="1" placeholder="Ex.: 60">
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="btn ghost" id="cancelForm">Cancelar</button>
+        <button type="submit" class="btn" id="submitForm">Salvar</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  "use strict";
+  var STORAGE_KEY = "protocolTrackerStudents";
+  var DAY = 86400000;
+
+  function todayStart() {
+    var d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  function parseDate(str) {
+    var parts = str.split("-").map(Number);
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+  }
+
+  function addDays(date, days) {
+    var d = new Date(date);
+    d.setDate(d.getDate() + days);
+    return d;
+  }
+
+  function fmtDate(date) {
+    return date.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+  }
+
+  function daysBetween(a, b) {
+    return Math.round((b - a) / DAY);
+  }
+
+  function load() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function save(students) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
+  }
+
+  var students = load();
+
+  function computeStatus(student) {
+    var start = parseDate(student.start);
+    var today = todayStart();
+    var expiry = addDays(start, student.durationDays);
+    var elapsed = Math.max(0, daysBetween(start, today));
+    var cycle = 45;
+    var protocolNumber = Math.min(
+      Math.ceil(student.durationDays / cycle),
+      Math.floor(elapsed / cycle) + 1
+    );
+    var nextSwap = addDays(start, protocolNumber * cycle);
+    while (nextSwap <= today && nextSwap < expiry) {
+      protocolNumber += 1;
+      nextSwap = addDays(start, protocolNumber * cycle);
+    }
+    var swapIsPastExpiry = nextSwap >= expiry;
+    var daysToExpiry = daysBetween(today, expiry);
+    var daysToSwap = daysBetween(today, nextSwap);
+
+    var state = "good";
+    var label = "Ativo";
+    if (daysToExpiry < 0) {
+      state = "danger";
+      label = "Plano vencido";
+    } else if (daysToExpiry <= 7) {
+      state = "warn";
+      label = "Plano vence em breve";
+    } else if (!swapIsPastExpiry && daysToSwap <= 3) {
+      state = "warn";
+      label = "Trocar treino em breve";
+    }
+
+    return {
+      expiry: expiry,
+      nextSwap: nextSwap,
+      swapIsPastExpiry: swapIsPastExpiry,
+      protocolNumber: Math.max(1, protocolNumber),
+      totalProtocols: Math.ceil(student.durationDays / cycle),
+      daysToExpiry: daysToExpiry,
+      daysToSwap: daysToSwap,
+      state: state,
+      label: label
+    };
+  }
+
+  function urgencyScore(student) {
+    var s = computeStatus(student);
+    if (s.daysToExpiry < 0) return -10000 + s.daysToExpiry;
+    return Math.min(s.daysToExpiry, s.swapIsPastExpiry ? Infinity : s.daysToSwap);
+  }
+
+  function renderStats(list) {
+    var vencidos = 0, venceSete = 0, trocaBreve = 0;
+    list.forEach(function (s) {
+      var st = computeStatus(s);
+      if (st.daysToExpiry < 0) vencidos++;
+      else if (st.daysToExpiry <= 7) venceSete++;
+      else if (!st.swapIsPastExpiry && st.daysToSwap <= 3) trocaBreve++;
+    });
+    var el = document.getElementById("stats");
+    el.innerHTML =
+      '<div class="stat"><div class="num mono">' + list.length + '</div><div class="label">Alunos ativos</div></div>' +
+      '<div class="stat warn"><div class="num mono">' + trocaBreve + '</div><div class="label">Trocam de treino em breve</div></div>' +
+      '<div class="stat warn"><div class="num mono">' + venceSete + '</div><div class="label">Planos vencendo em 7 dias</div></div>' +
+      '<div class="stat danger"><div class="num mono">' + vencidos + '</div><div class="label">Planos vencidos</div></div>';
+  }
+
+  function daysLabel(n, futureWord, pastWord) {
+    if (n === 0) return "hoje";
+    if (n > 0) return n + (n === 1 ? " dia" : " dias") + " " + futureWord;
+    return Math.abs(n) + (Math.abs(n) === 1 ? " dia" : " dias") + " " + pastWord;
+  }
+
+  function render() {
+    var query = document.getElementById("search").value.trim().toLowerCase();
+    var sortBy = document.getElementById("sortBy").value;
+
+    var filtered = students.filter(function (s) {
+      return s.name.toLowerCase().indexOf(query) !== -1 || s.plan.toLowerCase().indexOf(query) !== -1;
+    });
+
+    filtered.sort(function (a, b) {
+      if (sortBy === "name") return a.name.localeCompare(b.name, "pt-BR");
+      if (sortBy === "start") return parseDate(b.start) - parseDate(a.start);
+      return urgencyScore(a) - urgencyScore(b);
+    });
+
+    renderStats(students);
+
+    var wrap = document.getElementById("listWrap");
+    if (students.length === 0) {
+      wrap.innerHTML = '<div class="empty"><strong>Nenhum aluno cadastrado ainda</strong>Clique em “Adicionar aluno” para começar a acompanhar treinos e planos.</div>';
+      return;
+    }
+    if (filtered.length === 0) {
+      wrap.innerHTML = '<div class="empty">Nenhum aluno encontrado para essa busca.</div>';
+      return;
+    }
+
+    var html = '<div class="cards">';
+    filtered.forEach(function (s) {
+      var st = computeStatus(s);
+      var chipClass = st.state;
+      html += '<div class="card" data-id="' + s.id + '">' +
+        '<div class="col col-name">' +
+          '<div class="name">' + escapeHtml(s.name) + '</div>' +
+          '<div class="plan">' + escapeHtml(s.plan) + ' &middot; início ' + fmtDate(parseDate(s.start)) + '</div>' +
+        '</div>' +
+        '<div class="col">' +
+          '<span class="field-label">Troca de treino</span>' +
+          (st.swapIsPastExpiry
+            ? '<div class="value sub">— (fora do plano)</div>'
+            : '<div class="value mono">' + fmtDate(st.nextSwap) + '</div><div class="sub">' + daysLabel(st.daysToSwap, "restantes", "atrás") + ' &middot; protocolo ' + st.protocolNumber + '/' + st.totalProtocols + '</div>') +
+        '</div>' +
+        '<div class="col">' +
+          '<span class="field-label">Vencimento do plano</span>' +
+          '<div class="value mono">' + fmtDate(st.expiry) + '</div>' +
+          '<div class="sub">' + daysLabel(st.daysToExpiry, "restantes", "atrás") + '</div>' +
+        '</div>' +
+        '<div class="col">' +
+          '<span class="field-label">Status</span>' +
+          '<span class="chip ' + chipClass + '">' + st.label + '</span>' +
+        '</div>' +
+        '<div class="col col-actions">' +
+          '<button class="btn small ghost" data-action="edit" data-id="' + s.id + '">Editar</button>' +
+          '<button class="btn small danger-outline" data-action="delete" data-id="' + s.id + '">Excluir</button>' +
+        '</div>' +
+      '</div>';
+    });
+    html += '</div>';
+    wrap.innerHTML = html;
+  }
+
+  function escapeHtml(str) {
+    var d = document.createElement("div");
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  var dialog = document.getElementById("formDialog");
+  var form = document.getElementById("studentForm");
+  var durationSelect = document.getElementById("fDuration");
+  var customWrap = document.getElementById("customDaysWrap");
+
+  function openDialog(editing) {
+    document.getElementById("dialogTitle").textContent = editing ? "Editar aluno" : "Adicionar aluno";
+    dialog.showModal();
+  }
+
+  document.getElementById("openAdd").addEventListener("click", function () {
+    form.reset();
+    document.getElementById("editId").value = "";
+    document.getElementById("fStart").valueAsDate = todayStart();
+    durationSelect.value = "90";
+    customWrap.style.display = "none";
+    openDialog(false);
+  });
+
+  document.getElementById("cancelForm").addEventListener("click", function () {
+    dialog.close();
+  });
+
+  durationSelect.addEventListener("change", function () {
+    customWrap.style.display = durationSelect.value === "custom" ? "block" : "none";
+  });
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var id = document.getElementById("editId").value;
+    var durationDays = durationSelect.value === "custom"
+      ? parseInt(document.getElementById("fCustomDays").value, 10)
+      : parseInt(durationSelect.value, 10);
+    if (!durationDays || durationDays < 1) durationDays = 45;
+
+    var record = {
+      id: id || String(Date.now()),
+      name: document.getElementById("fName").value.trim(),
+      plan: document.getElementById("fPlan").value.trim(),
+      start: document.getElementById("fStart").value,
+      durationDays: durationDays
+    };
+
+    if (id) {
+      students = students.map(function (s) { return s.id === id ? record : s; });
+    } else {
+      students.push(record);
+    }
+    save(students);
+    dialog.close();
+    render();
+  });
+
+  document.getElementById("listWrap").addEventListener("click", function (e) {
+    var btn = e.target.closest("button[data-action]");
+    if (!btn) return;
+    var id = btn.getAttribute("data-id");
+    if (btn.getAttribute("data-action") === "delete") {
+      if (confirm("Excluir este aluno da lista?")) {
+        students = students.filter(function (s) { return s.id !== id; });
+        save(students);
+        render();
+      }
+    } else if (btn.getAttribute("data-action") === "edit") {
+      var s = students.find(function (s) { return s.id === id; });
+      if (!s) return;
+      document.getElementById("editId").value = s.id;
+      document.getElementById("fName").value = s.name;
+      document.getElementById("fPlan").value = s.plan;
+      document.getElementById("fStart").value = s.start;
+      var presets = ["45", "90", "135", "180", "365"];
+      if (presets.indexOf(String(s.durationDays)) !== -1) {
+        durationSelect.value = String(s.durationDays);
+        customWrap.style.display = "none";
+      } else {
+        durationSelect.value = "custom";
+        document.getElementById("fCustomDays").value = s.durationDays;
+        customWrap.style.display = "block";
+      }
+      openDialog(true);
+    }
+  });
+
+  document.getElementById("search").addEventListener("input", render);
+  document.getElementById("sortBy").addEventListener("change", render);
+
+  render();
+})();
+</script>
