@@ -4,7 +4,7 @@ Ferramenta simples (um único arquivo HTML) com dois espaços de trabalho — **
 
 ## Como usar
 
-Abra `index.html` em qualquer navegador — não precisa de servidor, build ou instalação. A navegação fica na barra lateral: alternância de espaço no topo, e as abas "Alunos"/"Pacientes" e "Acompanhamento" logo abaixo.
+Abra `index.html` em qualquer navegador — não precisa de servidor, build ou instalação. A página inteira pede usuário e senha antes de mostrar qualquer coisa (veja "Acesso à página" abaixo). Depois de entrar: a troca **Treinador / Nutricionista** fica no canto superior direito; as abas "Alunos"/"Pacientes" e "Acompanhamento" ficam na barra lateral esquerda.
 
 ## Espaço do Treinador
 
@@ -21,7 +21,7 @@ Clique em **"Treino trocado hoje"** para registrar a troca real (avança o proto
 
 ## Espaço da Nutricionista
 
-Acesso protegido por usuário e senha (veja "Acesso da Nutricionista" abaixo). Cadastro por paciente: nome, plano e data da primeira consulta. Os planos são:
+Cadastro por paciente: nome, plano e data da primeira consulta. Os planos são:
 
 - **SILVER** — consulta avulsa, 30 dias, sem retorno agendado.
 - **GOLD** — trimestral (retorno a cada 90 dias).
@@ -35,11 +35,13 @@ A partir da data da consulta, o painel calcula automaticamente:
 
 **Acompanhamento (CRM):** colunas Consulta, Elaboração do plano, PARQ, Renovação / Próxima consulta — refletindo o processo que ela usa com os pacientes (consulta → plano alimentar pelo app → PARQ de acompanhamento → renovação).
 
-A paleta desse espaço (verde-escuro, dourado e marfim) segue a identidade visual da Gabi.
+A paleta desse espaço (verde-escuro, dourado e marfim) segue a identidade visual da Gabi. O espaço do Treinador usa preto e vermelho, seguindo a identidade do site profvictorcollazo.com.
 
-### Acesso da Nutricionista
+## Acesso à página
 
-Usuário e senha padrão (definidos no início do `<script>`, na constante `GABI_LOGIN`): **usuário `gabi`, senha `nutri2026`** — troque antes de publicar. Importante: esse login é só uma trava simples no navegador (não existe servidor por trás). Ele impede que alguém abra o espaço por acidente, mas **não é uma proteção de verdade** — qualquer pessoa que veja o código-fonte da página encontra a senha. Antes de publicar este link para acesso externo com dados reais de pacientes, vale a pena migrar para uma autenticação de verdade (com backend).
+A página inteira (os dois espaços) fica atrás de uma tela de login. Usuário e senha padrão (definidos no início do `<script>`, na constante `APP_LOGIN`): **usuário `consultoria`, senha `acesso2026`** — troque antes de publicar. Depois de entrar uma vez, o navegador lembra o acesso (botão **"Sair"** na barra lateral bloqueia de novo).
+
+Importante: esse login é só uma trava simples no navegador (não existe servidor por trás). Ele impede que alguém abra a página por acidente, mas **não é uma proteção de verdade** — qualquer pessoa que veja o código-fonte da página encontra a senha. Antes de publicar este link para acesso externo com dados reais de pacientes, vale a pena migrar para uma autenticação de verdade (com backend).
 
 ## Dados
 

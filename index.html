@@ -3,75 +3,29 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Cormorant+Garamond:wght@500;600;700&display=swap">
 <style>
+  /* Victor's workspace commits to his own brand palette (black + red), matching
+     profvictorcollazo.com, regardless of the visitor's system theme. */
   :root {
-    --bg: #EEF0EE;
-    --surface: #FFFFFF;
-    --surface-2: #E4E8E4;
-    --ink: #1B2321;
-    --muted: #5B6660;
-    --border: #D6DBD5;
-    --accent: #3B5BA5;
+    --bg: #0D0D0D;
+    --surface: #171717;
+    --surface-2: #212121;
+    --ink: #F5F5F3;
+    --muted: #9B9B9B;
+    --border: #2B2B2B;
+    --accent: #E2402F;
     --accent-ink: #FFFFFF;
-    --accent-bg: #E7ECF7;
-    --premium: #9B5B2C;
-    --premium-bg: #F6E9DC;
-    --good: #1E8F72;
-    --good-bg: #E1F2EB;
-    --warn: #C97A2B;
-    --warn-bg: #FBEADA;
-    --danger: #C1443A;
-    --danger-bg: #FAE4E1;
-    --neutral: #6C6F63;
-    --neutral-bg: #E7E8E2;
-    --shadow: 0 1px 2px rgba(20,30,25,0.06), 0 8px 24px -12px rgba(20,30,25,0.18);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #14181A;
-      --surface: #1D2224;
-      --surface-2: #262C2E;
-      --ink: #ECEFEC;
-      --muted: #93A19B;
-      --border: #333B3A;
-      --accent: #8098D9;
-      --accent-ink: #10131A;
-      --accent-bg: #222B41;
-      --premium: #D69A61;
-      --premium-bg: #3A2A18;
-      --good: #4FBE95;
-      --good-bg: #16332A;
-      --warn: #E0A052;
-      --warn-bg: #3A2C15;
-      --danger: #E2695F;
-      --danger-bg: #3A1F1C;
-      --neutral: #9AA39C;
-      --neutral-bg: #262C28;
-      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
-    }
-  }
-
-  :root[data-theme="dark"] {
-    --bg: #14181A;
-    --surface: #1D2224;
-    --surface-2: #262C2E;
-    --ink: #ECEFEC;
-    --muted: #93A19B;
-    --border: #333B3A;
-    --accent: #8098D9;
-    --accent-ink: #10131A;
-    --accent-bg: #222B41;
-    --premium: #D69A61;
-    --premium-bg: #3A2A18;
-    --good: #4FBE95;
-    --good-bg: #16332A;
-    --warn: #E0A052;
-    --warn-bg: #3A2C15;
+    --accent-bg: #331714;
+    --premium: #C9862F;
+    --premium-bg: #2E2413;
+    --good: #4CAF7D;
+    --good-bg: #16281F;
+    --warn: #D9A23C;
+    --warn-bg: #2E2415;
     --danger: #E2695F;
-    --danger-bg: #3A1F1C;
-    --neutral: #9AA39C;
-    --neutral-bg: #262C28;
-    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    --danger-bg: #33201D;
+    --neutral: #9B9B9B;
+    --neutral-bg: #212121;
+    --shadow: 0 1px 2px rgba(0,0,0,0.5), 0 14px 30px -16px rgba(0,0,0,0.7);
   }
 
   /* Gabi's workspace commits to her own brand palette (deep green + gold + cream)
@@ -123,25 +77,15 @@
 
   .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
 
-  .app-shell {
+  .topbar {
     max-width: 1280px;
     margin: 0 auto;
     display: flex;
-    align-items: flex-start;
-    gap: 32px;
-  }
-  @media (max-width: 860px) {
-    .app-shell { flex-direction: column; }
-    .sidebar { position: static !important; width: 100%; }
-  }
-
-  .sidebar {
-    flex: 0 0 232px;
-    display: flex;
-    flex-direction: column;
-    gap: 22px;
-    position: sticky;
-    top: clamp(16px, 4vw, 40px);
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
   }
 
   .eyebrow {
@@ -156,7 +100,7 @@
   h1 {
     font-family: 'Big Shoulders Display', ui-sans-serif, sans-serif;
     font-weight: 800;
-    font-size: clamp(20px, 2.6vw, 27px);
+    font-size: clamp(22px, 3.2vw, 32px);
     letter-spacing: 0.01em;
     line-height: 1.05;
     margin: 0;
@@ -166,7 +110,7 @@
 
   .workspace-switch {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 6px;
     background: var(--surface-2);
     border: 1px solid var(--border);
@@ -180,17 +124,34 @@
     border: none;
     background: transparent;
     color: var(--muted);
-    padding: 10px 14px;
+    padding: 10px 16px;
     border-radius: 8px;
     cursor: pointer;
-    text-align: left;
+    text-align: center;
     transition: background 0.15s ease, color 0.15s ease;
   }
   .ws-btn.active { background: var(--accent); color: var(--accent-ink); }
   .ws-btn:hover:not(.active) { color: var(--ink); }
+
+  .app-shell {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 32px;
+  }
   @media (max-width: 860px) {
-    .workspace-switch { flex-direction: row; }
-    .ws-btn { text-align: center; }
+    .app-shell { flex-direction: column; }
+    .sidebar { position: static !important; width: 100%; }
+  }
+
+  .sidebar {
+    flex: 0 0 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    position: sticky;
+    top: clamp(16px, 4vw, 40px);
   }
 
   .sidenav { display: flex; flex-direction: column; gap: 4px; }
@@ -543,7 +504,7 @@
   .login-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(10, 16, 11, 0.72);
+    background: rgba(0, 0, 0, 0.72);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -552,30 +513,33 @@
   }
   .login-card {
     width: min(400px, 100%);
-    background: #1F3627;
-    border: 1px solid #3A4F3C;
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 16px;
     padding: 28px 26px;
-    color: #F3EFE2;
-    box-shadow: 0 20px 50px -20px rgba(0,0,0,0.6);
+    color: var(--ink);
+    box-shadow: var(--shadow);
     font-family: 'Manrope', sans-serif;
   }
-  .login-card .eyebrow { color: #C9A227; margin: 0 0 4px; }
-  .login-card h2 { font-family: 'Cormorant Garamond', serif; font-size: 26px; margin: 0 0 8px; font-weight: 600; }
-  .login-card .hint { color: #B7C2AC; font-size: 13px; margin: 0 0 18px; }
+  .login-card h2 {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-size: 26px;
+    margin: 0 0 8px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+  .login-card .hint { color: var(--muted); font-size: 13px; margin: 0 0 18px; }
   .login-fields { display: flex; flex-direction: column; gap: 10px; }
   .login-fields input {
     padding: 10px 12px;
     border-radius: 9px;
-    border: 1px solid #3A4F3C;
-    background: #172A1E;
-    color: #F3EFE2;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--ink);
     font-family: inherit;
     font-size: 14px;
   }
-  .login-error { color: #E2887A; font-size: 12.5px; margin: 10px 0 0; }
-  .login-card .btn { background: #C9A227; color: #1F2E1E; }
-  .login-card .btn.ghost { background: transparent; color: #F3EFE2; border: 1px solid #3A4F3C; }
+  .login-error { color: var(--danger); font-size: 12.5px; margin: 10px 0 0; }
 
   footer.note {
     margin-top: 32px;
@@ -585,24 +549,27 @@
   }
 </style>
 
+<div id="appShell" hidden>
+<div class="topbar">
+  <div>
+    <p class="eyebrow" id="eyebrow">Gestão</p>
+    <h1 id="brandTitle">Controle de Alunos</h1>
+  </div>
+
+  <div class="workspace-switch" id="workspaceSwitch">
+    <button type="button" class="ws-btn" data-workspace="victor">Treinador</button>
+    <button type="button" class="ws-btn" data-workspace="gabi">Nutricionista</button>
+  </div>
+</div>
+
 <div class="app-shell">
   <aside class="sidebar">
-    <div>
-      <p class="eyebrow" id="eyebrow">Gestão</p>
-      <h1 id="brandTitle">Controle de Alunos</h1>
-    </div>
-
-    <div class="workspace-switch" id="workspaceSwitch">
-      <button type="button" class="ws-btn" data-workspace="victor">Treinador</button>
-      <button type="button" class="ws-btn" data-workspace="gabi">Nutricionista</button>
-    </div>
-
     <nav class="sidenav" id="sidenav">
       <button type="button" class="sidenav-btn" data-tab="alunos" id="navAlunos">Alunos</button>
       <button type="button" class="sidenav-btn" data-tab="kanban">Acompanhamento</button>
     </nav>
 
-    <button type="button" class="btn ghost small" id="gabiLogout" hidden>Bloquear acesso</button>
+    <button type="button" class="btn ghost small" id="appLogout">Sair</button>
   </aside>
 
   <main class="main">
@@ -642,8 +609,9 @@
       <div class="kanban-board" id="kanbanBoard"></div>
     </section>
 
-    <footer class="note">Cada espaço (Treinador / Nutricionista) guarda seus próprios dados, separadamente, neste navegador. O espaço da Nutricionista pede usuário e senha; o do Treinador não. Atenção: esse login é apenas uma trava simples no navegador (sem servidor) — antes de publicar esta página para acesso externo, vale reforçar com um controle de acesso de verdade, já que envolve dados de pacientes.</footer>
+    <footer class="note">Cada espaço (Treinador / Nutricionista) guarda seus próprios dados, separadamente, neste navegador. O acesso a esta página inteira pede usuário e senha — mas é apenas uma trava simples no navegador (sem servidor). Antes de publicar esta página para acesso externo, vale reforçar com um controle de acesso de verdade, já que envolve dados de pacientes.</footer>
   </main>
+</div>
 </div>
 
 <dialog class="appDialog" id="formDialog">
@@ -721,15 +689,14 @@
 <div class="login-overlay" id="loginOverlay" hidden>
   <form class="login-card" id="loginForm">
     <p class="eyebrow">Acesso restrito</p>
-    <h2>Painel da Nutricionista</h2>
-    <p class="hint">Informe usuário e senha para ver os pacientes.</p>
+    <h2>Controle de Alunos e Pacientes</h2>
+    <p class="hint">Informe usuário e senha para entrar.</p>
     <div class="login-fields">
       <input id="loginUser" placeholder="Usuário" autocomplete="username" required>
       <input id="loginPass" type="password" placeholder="Senha" autocomplete="current-password" required>
     </div>
     <p class="login-error" id="loginError" hidden>Usuário ou senha incorretos.</p>
     <div class="dialog-actions">
-      <button type="button" class="btn ghost" id="loginCancel">Cancelar</button>
       <button type="submit" class="btn">Entrar</button>
     </div>
   </form>
@@ -741,14 +708,15 @@
   var STORAGE_PREFIX = "consultoriaOnlineRecords_";
   var LEGACY_KEY = "protocolTrackerStudentsV2";
   var UI_STATE_KEY = "consultoriaOnlineUIState";
-  var UNLOCK_KEY = "consultoriaOnlineGabiUnlocked";
+  var UNLOCK_KEY = "consultoriaOnlineUnlocked";
   var DAY = 86400000;
   var CYCLE = 45;
 
-  /* Simple client-side gate for the nutritionist workspace. This is a soft
-     lock only (no server) — good enough to keep casual visitors out, not a
-     real security boundary. Change the password here before sharing. */
-  var GABI_LOGIN = { user: "gabi", pass: "nutri2026" };
+  /* Simple client-side gate in front of the whole page (both workspaces).
+     This is a soft lock only (no server) — good enough to keep casual
+     visitors out, not a real security boundary. Change the password here
+     before sharing the link. */
+  var APP_LOGIN = { user: "consultoria", pass: "acesso2026" };
 
   var PLANS_TREINO = {
     BASIC: { label: "BASIC", protocols: 1 },
@@ -799,8 +767,7 @@
       searchPlaceholder: "Buscar aluno…",
       planOrder: PLAN_ORDER_TREINO,
       plans: PLANS_TREINO,
-      stages: STAGES_TREINO,
-      requiresLogin: false
+      stages: STAGES_TREINO
     },
     gabi: {
       role: "Nutricionista",
@@ -814,8 +781,7 @@
       searchPlaceholder: "Buscar paciente…",
       planOrder: PLAN_ORDER_NUTRI,
       plans: PLANS_NUTRI,
-      stages: STAGES_NUTRI,
-      requiresLogin: true
+      stages: STAGES_NUTRI
     }
   };
 
@@ -895,16 +861,15 @@
     localStorage.setItem(UI_STATE_KEY, JSON.stringify(state));
   }
 
-  function isGabiUnlocked() {
+  function isAppUnlocked() {
     return localStorage.getItem(UNLOCK_KEY) === "1";
   }
-  function unlockGabi() { localStorage.setItem(UNLOCK_KEY, "1"); }
-  function lockGabi() { localStorage.removeItem(UNLOCK_KEY); }
+  function unlockApp() { localStorage.setItem(UNLOCK_KEY, "1"); }
+  function lockApp() { localStorage.removeItem(UNLOCK_KEY); }
 
   migrateLegacyData();
   var uiState = loadUIState();
   var currentWorkspace = uiState.workspace === "gabi" ? "gabi" : "victor";
-  if (currentWorkspace === "gabi" && !isGabiUnlocked()) currentWorkspace = "victor";
   var currentTab = uiState.tab === "kanban" ? "kanban" : "alunos";
   var records = loadRecords(currentWorkspace);
 
@@ -1057,7 +1022,6 @@
     document.getElementById("sortStartOption").textContent = currentWorkspace === "victor"
       ? "Ordenar: início mais recente"
       : "Ordenar: consulta mais recente";
-    document.getElementById("gabiLogout").hidden = currentWorkspace !== "gabi";
   }
 
   function applyTabUI() {
@@ -1095,13 +1059,7 @@
   document.getElementById("workspaceSwitch").addEventListener("click", function (e) {
     var btn = e.target.closest(".ws-btn");
     if (!btn) return;
-    var target = btn.getAttribute("data-workspace");
-    if (target === currentWorkspace) return;
-    if (target === "gabi" && !isGabiUnlocked()) {
-      openLogin();
-      return;
-    }
-    switchWorkspace(target);
+    switchWorkspace(btn.getAttribute("data-workspace"));
   });
 
   document.getElementById("sidenav").addEventListener("click", function (e) {
@@ -1110,32 +1068,25 @@
     switchTab(btn.getAttribute("data-tab"));
   });
 
-  document.getElementById("gabiLogout").addEventListener("click", function () {
-    lockGabi();
-    switchWorkspace("victor");
-  });
-
-  /* ---- Login gate ---- */
-
-  function openLogin() {
+  document.getElementById("appLogout").addEventListener("click", function () {
+    lockApp();
+    document.getElementById("appShell").hidden = true;
     document.getElementById("loginForm").reset();
     document.getElementById("loginError").hidden = true;
     document.getElementById("loginOverlay").hidden = false;
     document.getElementById("loginUser").focus();
-  }
-  function closeLogin() {
-    document.getElementById("loginOverlay").hidden = true;
-  }
+  });
 
-  document.getElementById("loginCancel").addEventListener("click", closeLogin);
+  /* ---- Login gate (protects the whole page, both workspaces) ---- */
+
   document.getElementById("loginForm").addEventListener("submit", function (e) {
     e.preventDefault();
     var u = document.getElementById("loginUser").value.trim();
     var p = document.getElementById("loginPass").value;
-    if (u === GABI_LOGIN.user && p === GABI_LOGIN.pass) {
-      unlockGabi();
-      closeLogin();
-      switchWorkspace("gabi");
+    if (u === APP_LOGIN.user && p === APP_LOGIN.pass) {
+      unlockApp();
+      document.getElementById("loginOverlay").hidden = true;
+      document.getElementById("appShell").hidden = false;
     } else {
       document.getElementById("loginError").hidden = false;
     }
@@ -1642,5 +1593,14 @@
   applyTabUI();
   render();
   renderKanban();
+
+  if (isAppUnlocked()) {
+    document.getElementById("loginOverlay").hidden = true;
+    document.getElementById("appShell").hidden = false;
+  } else {
+    document.getElementById("loginOverlay").hidden = false;
+    document.getElementById("appShell").hidden = true;
+    document.getElementById("loginUser").focus();
+  }
 })();
 </script>
