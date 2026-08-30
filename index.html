@@ -1,7 +1,7 @@
 <title>Controle de Alunos — Consultoria Online</title>
-<meta name="description" content="Controle de alunos, protocolos de treino de 45 dias, previsão de término de plano e acompanhamento em CRM por espaço de trabalho.">
+<meta name="description" content="Controle de alunos e pacientes, protocolos de treino, consultas nutricionais e acompanhamento em CRM por espaço de trabalho.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Cormorant+Garamond:wght@500;600;700&display=swap">
 <style>
   :root {
     --bg: #EEF0EE;
@@ -74,24 +74,42 @@
     --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
   }
 
-  /* Per-workspace accent: Victor keeps the default blue, Gabi's space gets its own hue
-     so the two are visually unmistakable at a glance. */
+  /* Gabi's workspace commits to her own brand palette (deep green + gold + cream)
+     on purpose, regardless of light/dark system setting — same idea as the
+     pricing page she uses. */
   body[data-workspace="gabi"] {
-    --accent: #A2436B;
-    --accent-ink: #FFFFFF;
-    --accent-bg: #F6E4EC;
+    --bg: #172A1E;
+    --surface: #1F3627;
+    --surface-2: #24402C;
+    --ink: #F3EFE2;
+    --muted: #B7C2AC;
+    --border: #3A4F3C;
+    --accent: #C9A227;
+    --accent-ink: #20301F;
+    --accent-bg: #2E3B26;
+    --premium: #C9A227;
+    --premium-bg: #2E3B26;
+    --good: #8FBF8A;
+    --good-bg: #23392A;
+    --warn: #D9A94C;
+    --warn-bg: #3A2F1C;
+    --danger: #D97A6B;
+    --danger-bg: #3A2620;
+    --neutral: #B7C2AC;
+    --neutral-bg: #24402C;
+    --shadow: 0 1px 2px rgba(0,0,0,0.35), 0 12px 28px -16px rgba(0,0,0,0.6);
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) body[data-workspace="gabi"] {
-      --accent: #D98FB0;
-      --accent-ink: #2A1420;
-      --accent-bg: #3A2430;
-    }
+  body[data-workspace="gabi"] h1,
+  body[data-workspace="gabi"] h2.view-title,
+  body[data-workspace="gabi"] .dialog-inner h2 {
+    font-family: 'Cormorant Garamond', 'Big Shoulders Display', serif;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 600;
   }
-  :root[data-theme="dark"] body[data-workspace="gabi"] {
-    --accent: #D98FB0;
-    --accent-ink: #2A1420;
-    --accent-bg: #3A2430;
+  body[data-workspace="gabi"] .stat .num {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 700;
   }
 
   * { box-sizing: border-box; }
@@ -100,67 +118,118 @@
     background: var(--bg);
     color: var(--ink);
     font-family: 'Manrope', ui-sans-serif, system-ui, sans-serif;
-    padding: clamp(16px, 4vw, 48px);
-    max-width: 1180px;
-    margin: 0 auto;
+    padding: clamp(16px, 4vw, 40px);
   }
 
   .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
 
-  header.top {
+  .app-shell {
+    max-width: 1280px;
+    margin: 0 auto;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 16px;
-    margin-bottom: 20px;
+    align-items: flex-start;
+    gap: 32px;
+  }
+  @media (max-width: 860px) {
+    .app-shell { flex-direction: column; }
+    .sidebar { position: static !important; width: 100%; }
+  }
+
+  .sidebar {
+    flex: 0 0 232px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    position: sticky;
+    top: clamp(16px, 4vw, 40px);
   }
 
   .eyebrow {
     text-transform: uppercase;
     letter-spacing: 0.14em;
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 700;
     color: var(--accent);
     margin: 0 0 4px;
-    transition: color 0.15s ease;
   }
 
   h1 {
     font-family: 'Big Shoulders Display', ui-sans-serif, sans-serif;
     font-weight: 800;
-    font-size: clamp(26px, 4.2vw, 40px);
+    font-size: clamp(20px, 2.6vw, 27px);
     letter-spacing: 0.01em;
-    line-height: 0.98;
+    line-height: 1.05;
     margin: 0;
     text-wrap: balance;
     text-transform: uppercase;
   }
 
-  .top-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-
   .workspace-switch {
-    display: inline-flex;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
     background: var(--surface-2);
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 3px;
-    gap: 3px;
+    border-radius: 12px;
+    padding: 6px;
   }
   .ws-btn {
     font-family: inherit;
     font-weight: 700;
-    font-size: 13px;
+    font-size: 13.5px;
     border: none;
     background: transparent;
     color: var(--muted);
-    padding: 8px 14px;
+    padding: 10px 14px;
     border-radius: 8px;
     cursor: pointer;
+    text-align: left;
     transition: background 0.15s ease, color 0.15s ease;
   }
   .ws-btn.active { background: var(--accent); color: var(--accent-ink); }
   .ws-btn:hover:not(.active) { color: var(--ink); }
+  @media (max-width: 860px) {
+    .workspace-switch { flex-direction: row; }
+    .ws-btn { text-align: center; }
+  }
+
+  .sidenav { display: flex; flex-direction: column; gap: 4px; }
+  .sidenav-btn {
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 14px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    padding: 10px 12px;
+    border-radius: 8px;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .sidenav-btn.active { background: var(--accent-bg); color: var(--accent); }
+  .sidenav-btn:hover:not(.active) { color: var(--ink); }
+  @media (max-width: 860px) {
+    .sidenav { flex-direction: row; flex-wrap: wrap; }
+  }
+
+  .main { flex: 1; min-width: 0; }
+
+  .view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  h2.view-title {
+    font-family: 'Big Shoulders Display', sans-serif;
+    font-weight: 800;
+    font-size: clamp(21px, 3vw, 28px);
+    text-transform: uppercase;
+    margin: 0;
+  }
 
   .btn {
     font-family: inherit;
@@ -200,28 +269,6 @@
     border: 1px solid var(--good);
     box-shadow: none;
   }
-
-  .subtabs {
-    display: flex;
-    gap: 0;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 24px;
-  }
-  .subtab-btn {
-    font-family: inherit;
-    font-weight: 700;
-    font-size: 14px;
-    border: none;
-    background: transparent;
-    color: var(--muted);
-    padding: 10px 4px;
-    margin-right: 22px;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: color 0.15s ease, border-color 0.15s ease;
-  }
-  .subtab-btn.active { color: var(--ink); border-bottom-color: var(--accent); }
-  .subtab-btn:hover { color: var(--ink); }
 
   .stats {
     display: grid;
@@ -438,6 +485,7 @@
   }
   .kanban-card.dragging { opacity: 0.5; }
   .kc-name { font-weight: 700; font-size: 13.5px; }
+  .kc-sub { font-size: 12px; color: var(--muted); }
   .kc-badges { display: flex; gap: 5px; flex-wrap: wrap; }
   .kc-move { display: flex; flex-direction: column; gap: 3px; }
   .kc-move select {
@@ -451,6 +499,8 @@
     font-size: 12.5px;
   }
   .kanban-empty { color: var(--muted); font-size: 12.5px; text-align: center; padding: 14px 0; }
+
+  .contents-wrap { display: contents; }
 
   dialog.appDialog {
     border: none;
@@ -490,59 +540,111 @@
     margin-top: 22px;
   }
 
+  .login-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 16, 11, 0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 50;
+  }
+  .login-card {
+    width: min(400px, 100%);
+    background: #1F3627;
+    border: 1px solid #3A4F3C;
+    border-radius: 16px;
+    padding: 28px 26px;
+    color: #F3EFE2;
+    box-shadow: 0 20px 50px -20px rgba(0,0,0,0.6);
+    font-family: 'Manrope', sans-serif;
+  }
+  .login-card .eyebrow { color: #C9A227; margin: 0 0 4px; }
+  .login-card h2 { font-family: 'Cormorant Garamond', serif; font-size: 26px; margin: 0 0 8px; font-weight: 600; }
+  .login-card .hint { color: #B7C2AC; font-size: 13px; margin: 0 0 18px; }
+  .login-fields { display: flex; flex-direction: column; gap: 10px; }
+  .login-fields input {
+    padding: 10px 12px;
+    border-radius: 9px;
+    border: 1px solid #3A4F3C;
+    background: #172A1E;
+    color: #F3EFE2;
+    font-family: inherit;
+    font-size: 14px;
+  }
+  .login-error { color: #E2887A; font-size: 12.5px; margin: 10px 0 0; }
+  .login-card .btn { background: #C9A227; color: #1F2E1E; }
+  .login-card .btn.ghost { background: transparent; color: #F3EFE2; border: 1px solid #3A4F3C; }
+
   footer.note {
     margin-top: 32px;
     color: var(--muted);
-    font-size: 12.5px;
-    text-align: center;
+    font-size: 12px;
+    max-width: 68ch;
   }
 </style>
 
-<header class="top">
-  <div>
-    <p class="eyebrow" id="eyebrow">Gestão de alunos</p>
-    <h1>Controle de Alunos Consultoria Online</h1>
-  </div>
-  <div class="top-actions">
-    <div class="workspace-switch" id="workspaceSwitch">
-      <button type="button" class="ws-btn" data-workspace="victor">Victor</button>
-      <button type="button" class="ws-btn" data-workspace="gabi">Gabi</button>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div>
+      <p class="eyebrow" id="eyebrow">Gestão</p>
+      <h1 id="brandTitle">Controle de Alunos</h1>
     </div>
-    <button class="btn" id="openAdd">+ Adicionar aluno</button>
-  </div>
-</header>
 
-<nav class="subtabs" id="subtabs">
-  <button type="button" class="subtab-btn" data-tab="alunos">Alunos</button>
-  <button type="button" class="subtab-btn" data-tab="kanban">Acompanhamento</button>
-</nav>
+    <div class="workspace-switch" id="workspaceSwitch">
+      <button type="button" class="ws-btn" data-workspace="victor">Treinador</button>
+      <button type="button" class="ws-btn" data-workspace="gabi">Nutricionista</button>
+    </div>
 
-<section id="viewAlunos">
-  <section class="stats" id="stats"></section>
+    <nav class="sidenav" id="sidenav">
+      <button type="button" class="sidenav-btn" data-tab="alunos" id="navAlunos">Alunos</button>
+      <button type="button" class="sidenav-btn" data-tab="kanban">Acompanhamento</button>
+    </nav>
 
-  <div class="toolbar">
-    <input type="search" id="search" placeholder="Buscar aluno…">
-    <select id="filterProduct">
-      <option value="all">Todos os produtos</option>
-      <option value="treino">Minha Consultoria (treino)</option>
-      <option value="premium">Consultoria Premium (treino e dieta)</option>
-    </select>
-    <select id="sortBy">
-      <option value="urgency">Ordenar: mais urgente primeiro</option>
-      <option value="name">Ordenar: nome (A–Z)</option>
-      <option value="start">Ordenar: início mais recente</option>
-    </select>
-  </div>
+    <button type="button" class="btn ghost small" id="gabiLogout" hidden>Bloquear acesso</button>
+  </aside>
 
-  <div id="listWrap"></div>
-</section>
+  <main class="main">
+    <div class="view-header">
+      <h2 class="view-title" id="viewHeading">Alunos</h2>
+      <button class="btn" id="openAdd">+ Adicionar aluno</button>
+    </div>
 
-<section id="viewKanban" hidden>
-  <p class="kanban-intro">Arraste os cards entre as colunas para atualizar a etapa de cada aluno. Em telas sem suporte a arrastar (celular/tablet), use o menu "Mover para" dentro do card.</p>
-  <div class="kanban-board" id="kanbanBoard"></div>
-</section>
+    <section id="viewAlunos">
+      <section class="stats" id="stats"></section>
 
-<footer class="note">Cada espaço (Victor / Gabi) guarda seus próprios dados, separadamente, neste navegador. Não há senha — é só uma forma de organizar sem misturar os alunos de cada um.</footer>
+      <div class="toolbar">
+        <input type="search" id="search" placeholder="Buscar aluno…">
+        <select id="filterProduct">
+          <option value="all">Todos os produtos</option>
+          <option value="treino">Minha Consultoria (treino)</option>
+          <option value="premium">Consultoria Premium (treino e dieta)</option>
+        </select>
+        <select id="filterPlanNutri" hidden>
+          <option value="all">Todos os planos</option>
+          <option value="SILVER">Silver</option>
+          <option value="GOLD">Gold</option>
+          <option value="DIAMOND">Diamond</option>
+        </select>
+        <select id="sortBy">
+          <option value="urgency">Ordenar: mais urgente primeiro</option>
+          <option value="name">Ordenar: nome (A–Z)</option>
+          <option value="start" id="sortStartOption">Ordenar: início mais recente</option>
+        </select>
+      </div>
+
+      <div id="listWrap"></div>
+    </section>
+
+    <section id="viewKanban" hidden>
+      <p class="kanban-intro">Arraste os cards entre as colunas para atualizar a etapa. Em celular/tablet, onde arrastar não funciona bem, use o menu "Mover para" dentro do card.</p>
+      <div class="kanban-board" id="kanbanBoard"></div>
+    </section>
+
+    <footer class="note">Cada espaço (Treinador / Nutricionista) guarda seus próprios dados, separadamente, neste navegador. O espaço da Nutricionista pede usuário e senha; o do Treinador não. Atenção: esse login é apenas uma trava simples no navegador (sem servidor) — antes de publicar esta página para acesso externo, vale reforçar com um controle de acesso de verdade, já que envolve dados de pacientes.</footer>
+  </main>
+</div>
 
 <dialog class="appDialog" id="formDialog">
   <div class="dialog-inner">
@@ -551,34 +653,43 @@
       <input type="hidden" id="editId">
       <div class="form-grid">
         <div class="full">
-          <label class="field-label" for="fName">Nome do aluno</label>
+          <label class="field-label" for="fName">Nome</label>
           <input id="fName" required placeholder="Ex.: Marina Souza">
-        </div>
-        <div class="full">
-          <label class="field-label" for="fProduct">Produto</label>
-          <select id="fProduct">
-            <option value="treino">Minha Consultoria (treino)</option>
-            <option value="premium">Consultoria Premium (treino e dieta)</option>
-          </select>
         </div>
         <div class="full">
           <label class="field-label" for="fPlan">Plano contratado</label>
           <select id="fPlan"></select>
         </div>
-        <div>
-          <label class="field-label" for="fStart">Início do plano</label>
-          <input id="fStart" type="date" required>
+        <div id="victorFields" class="contents-wrap">
+          <div class="full">
+            <label class="field-label" for="fProduct">Produto</label>
+            <select id="fProduct">
+              <option value="treino">Minha Consultoria (treino)</option>
+              <option value="premium">Consultoria Premium (treino e dieta)</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label" for="fStart">Início do plano</label>
+            <input id="fStart" type="date">
+          </div>
+          <div>
+            <label class="field-label" for="fProtocolNumber">Protocolo atual</label>
+            <input id="fProtocolNumber" type="number" min="1" value="1">
+          </div>
+          <div class="full">
+            <label class="field-label" for="fProtocolStart">Início do protocolo atual</label>
+            <input id="fProtocolStart" type="date">
+          </div>
         </div>
-        <div>
-          <label class="field-label" for="fProtocolNumber">Protocolo atual</label>
-          <input id="fProtocolNumber" type="number" min="1" value="1" required>
-        </div>
-        <div class="full">
-          <label class="field-label" for="fProtocolStart">Início do protocolo atual</label>
-          <input id="fProtocolStart" type="date" required>
+        <div id="gabiFields" class="contents-wrap" hidden>
+          <div class="full">
+            <label class="field-label" for="fConsultaDate">Data da consulta</label>
+            <input id="fConsultaDate" type="date">
+          </div>
         </div>
       </div>
-      <p class="hint" style="margin-top:14px;">Para um aluno novo, deixe "protocolo atual" como 1 e a mesma data de início. Se o aluno já estiver no meio do plano, ajuste os dois campos acima.</p>
+      <p class="hint" id="hintTreino" style="margin-top:14px;">Para um aluno novo, deixe "protocolo atual" como 1 e a mesma data de início. Se o aluno já estiver no meio do plano, ajuste os dois campos.</p>
+      <p class="hint" id="hintNutri" style="margin-top:14px;" hidden>Para um paciente novo, use a data da primeira consulta. O envio do PARQ (15 dias depois) e a previsão de retorno são calculados automaticamente a partir dessa data.</p>
       <div class="dialog-actions">
         <button type="button" class="btn ghost" id="cancelForm">Cancelar</button>
         <button type="submit" class="btn" id="submitForm">Salvar</button>
@@ -607,41 +718,106 @@
   </div>
 </dialog>
 
+<div class="login-overlay" id="loginOverlay" hidden>
+  <form class="login-card" id="loginForm">
+    <p class="eyebrow">Acesso restrito</p>
+    <h2>Painel da Nutricionista</h2>
+    <p class="hint">Informe usuário e senha para ver os pacientes.</p>
+    <div class="login-fields">
+      <input id="loginUser" placeholder="Usuário" autocomplete="username" required>
+      <input id="loginPass" type="password" placeholder="Senha" autocomplete="current-password" required>
+    </div>
+    <p class="login-error" id="loginError" hidden>Usuário ou senha incorretos.</p>
+    <div class="dialog-actions">
+      <button type="button" class="btn ghost" id="loginCancel">Cancelar</button>
+      <button type="submit" class="btn">Entrar</button>
+    </div>
+  </form>
+</div>
+
 <script>
 (function () {
   "use strict";
-  var STORAGE_PREFIX = "consultoriaOnlineStudents_";
+  var STORAGE_PREFIX = "consultoriaOnlineRecords_";
   var LEGACY_KEY = "protocolTrackerStudentsV2";
   var UI_STATE_KEY = "consultoriaOnlineUIState";
+  var UNLOCK_KEY = "consultoriaOnlineGabiUnlocked";
   var DAY = 86400000;
   var CYCLE = 45;
 
-  var WORKSPACES = {
-    victor: { label: "Victor" },
-    gabi: { label: "Gabi" }
-  };
+  /* Simple client-side gate for the nutritionist workspace. This is a soft
+     lock only (no server) — good enough to keep casual visitors out, not a
+     real security boundary. Change the password here before sharing. */
+  var GABI_LOGIN = { user: "gabi", pass: "nutri2026" };
 
-  var PLANS = {
+  var PLANS_TREINO = {
     BASIC: { label: "BASIC", protocols: 1 },
     PLUS: { label: "PLUS", protocols: 2 },
     ADVANCED: { label: "ADVANCED", protocols: 3 },
     ELITE: { label: "ELITE", protocols: 6 },
     DIAMOND: { label: "DIAMOND", protocols: 12 }
   };
-  var PLAN_ORDER = ["BASIC", "PLUS", "ADVANCED", "ELITE", "DIAMOND"];
+  var PLAN_ORDER_TREINO = ["BASIC", "PLUS", "ADVANCED", "ELITE", "DIAMOND"];
+
+  var PLANS_NUTRI = {
+    SILVER: { label: "SILVER", durationDays: 30, hasReturn: false },
+    GOLD: { label: "GOLD", durationDays: 90, hasReturn: true },
+    DIAMOND: { label: "DIAMOND", durationDays: 180, hasReturn: true }
+  };
+  var PLAN_ORDER_NUTRI = ["SILVER", "GOLD", "DIAMOND"];
 
   var PRODUCTS = {
     treino: { label: "Minha Consultoria", badge: "TREINO", cls: "product-treino" },
     premium: { label: "Consultoria Premium", badge: "TREINO + DIETA", cls: "product-premium" }
   };
 
-  var STAGES = [
+  var STAGES_TREINO = [
     { key: "onboarding", label: "Onboarding" },
     { key: "ativo", label: "Ativo" },
     { key: "atencao", label: "Atenção" },
     { key: "renovacao", label: "Renovação" },
     { key: "encerrado", label: "Encerrado" }
   ];
+
+  var STAGES_NUTRI = [
+    { key: "consulta", label: "Consulta" },
+    { key: "elaboracao", label: "Elaboração do plano" },
+    { key: "parq", label: "PARQ" },
+    { key: "renovacao", label: "Renovação / Próxima consulta" }
+  ];
+
+  var CONFIG = {
+    victor: {
+      role: "Treinador",
+      brandTitle: "Controle de Alunos",
+      person: "aluno",
+      personCap: "Aluno",
+      personCapPlural: "Alunos",
+      addLabel: "+ Adicionar aluno",
+      addDialogTitle: "Adicionar aluno",
+      editDialogTitle: "Editar aluno",
+      searchPlaceholder: "Buscar aluno…",
+      planOrder: PLAN_ORDER_TREINO,
+      plans: PLANS_TREINO,
+      stages: STAGES_TREINO,
+      requiresLogin: false
+    },
+    gabi: {
+      role: "Nutricionista",
+      brandTitle: "Controle de Pacientes",
+      person: "paciente",
+      personCap: "Paciente",
+      personCapPlural: "Pacientes",
+      addLabel: "+ Adicionar paciente",
+      addDialogTitle: "Adicionar paciente",
+      editDialogTitle: "Editar paciente",
+      searchPlaceholder: "Buscar paciente…",
+      planOrder: PLAN_ORDER_NUTRI,
+      plans: PLANS_NUTRI,
+      stages: STAGES_NUTRI,
+      requiresLogin: true
+    }
+  };
 
   function todayStart() {
     var d = new Date();
@@ -681,6 +857,12 @@
     return d.innerHTML;
   }
 
+  function daysLabel(n, futureWord, pastWord) {
+    if (n === 0) return "hoje";
+    if (n > 0) return n + (n === 1 ? " dia" : " dias") + " " + futureWord;
+    return Math.abs(n) + (Math.abs(n) === 1 ? " dia" : " dias") + " " + pastWord;
+  }
+
   function migrateLegacyData() {
     var victorKey = STORAGE_PREFIX + "victor";
     if (!localStorage.getItem(victorKey)) {
@@ -689,7 +871,7 @@
     }
   }
 
-  function loadStudents(workspaceId) {
+  function loadRecords(workspaceId) {
     try {
       return JSON.parse(localStorage.getItem(STORAGE_PREFIX + workspaceId)) || [];
     } catch (e) {
@@ -697,7 +879,7 @@
     }
   }
 
-  function saveStudents(workspaceId, list) {
+  function saveRecords(workspaceId, list) {
     localStorage.setItem(STORAGE_PREFIX + workspaceId, JSON.stringify(list));
   }
 
@@ -713,25 +895,38 @@
     localStorage.setItem(UI_STATE_KEY, JSON.stringify(state));
   }
 
+  function isGabiUnlocked() {
+    return localStorage.getItem(UNLOCK_KEY) === "1";
+  }
+  function unlockGabi() { localStorage.setItem(UNLOCK_KEY, "1"); }
+  function lockGabi() { localStorage.removeItem(UNLOCK_KEY); }
+
   migrateLegacyData();
   var uiState = loadUIState();
   var currentWorkspace = uiState.workspace === "gabi" ? "gabi" : "victor";
+  if (currentWorkspace === "gabi" && !isGabiUnlocked()) currentWorkspace = "victor";
   var currentTab = uiState.tab === "kanban" ? "kanban" : "alunos";
-  var students = loadStudents(currentWorkspace);
+  var records = loadRecords(currentWorkspace);
 
   function persist() {
-    saveStudents(currentWorkspace, students);
+    saveRecords(currentWorkspace, records);
   }
 
-  function populatePlanSelect(selectEl) {
-    selectEl.innerHTML = PLAN_ORDER.map(function (key) {
-      var p = PLANS[key];
-      return '<option value="' + key + '">' + p.label + ' (' + p.protocols + (p.protocols === 1 ? ' protocolo' : ' protocolos') + ')</option>';
+  function populatePlanSelect(selectEl, workspaceId) {
+    var cfg = CONFIG[workspaceId];
+    selectEl.innerHTML = cfg.planOrder.map(function (key) {
+      var p = cfg.plans[key];
+      var extra = workspaceId === "victor"
+        ? ' (' + p.protocols + (p.protocols === 1 ? ' protocolo' : ' protocolos') + ')'
+        : '';
+      return '<option value="' + key + '">' + p.label + extra + '</option>';
     }).join("");
   }
 
-  function computeStatus(student) {
-    var plan = PLANS[student.plan] || PLANS.BASIC;
+  /* ---- Trainer (protocol-based) status ---- */
+
+  function computeStatusTreino(student) {
+    var plan = PLANS_TREINO[student.plan] || PLANS_TREINO.BASIC;
     var totalProtocols = plan.protocols;
     var protocolStart = parseDate(student.protocolStart);
     var today = todayStart();
@@ -774,44 +969,231 @@
     };
   }
 
-  function urgencyScore(student) {
-    var st = computeStatus(student);
+  function urgencyScoreTreino(student) {
+    var st = computeStatusTreino(student);
     if (st.completed) return 100000;
     if (st.delayDays > 0) return -10000 - st.delayDays;
     return Math.min(st.daysToSwap, st.daysToEnd);
   }
 
-  function daysLabel(n, futureWord, pastWord) {
-    if (n === 0) return "hoje";
-    if (n > 0) return n + (n === 1 ? " dia" : " dias") + " " + futureWord;
-    return Math.abs(n) + (Math.abs(n) === 1 ? " dia" : " dias") + " " + pastWord;
+  /* ---- Nutritionist (consultation-based) status ---- */
+
+  function computeStatusNutri(patient) {
+    var plan = PLANS_NUTRI[patient.plan] || PLANS_NUTRI.SILVER;
+    var consulta = parseDate(patient.consultaDate);
+    var today = todayStart();
+    var parqDate = addDays(consulta, 15);
+    var daysToParq = daysBetween(today, parqDate);
+    var nextConsultaDate = plan.hasReturn ? addDays(consulta, plan.durationDays) : null;
+    var daysToNextConsulta = nextConsultaDate ? daysBetween(today, nextConsultaDate) : null;
+
+    var state = "good";
+    var label = "Em acompanhamento";
+
+    if (patient.stage === "renovacao") {
+      if (!plan.hasReturn) {
+        state = "neutral";
+        label = "Acompanhamento encerrado";
+      } else if (daysToNextConsulta < 0) {
+        state = "danger";
+        label = "Renovação atrasada " + Math.abs(daysToNextConsulta) + (Math.abs(daysToNextConsulta) === 1 ? " dia" : " dias");
+      } else if (daysToNextConsulta <= 7) {
+        state = "warn";
+        label = "Renovação em breve";
+      } else {
+        label = "Aguardando renovação";
+      }
+    } else if (daysToParq < 0) {
+      state = "danger";
+      label = "Enviar PARQ (atrasado " + Math.abs(daysToParq) + (Math.abs(daysToParq) === 1 ? " dia" : " dias") + ")";
+    } else if (daysToParq <= 3) {
+      state = "warn";
+      label = "Enviar PARQ em breve";
+    }
+
+    return {
+      plan: plan,
+      parqDate: parqDate,
+      daysToParq: daysToParq,
+      nextConsultaDate: nextConsultaDate,
+      daysToNextConsulta: daysToNextConsulta,
+      state: state,
+      label: label
+    };
   }
 
-  function renderStats(list) {
-    var trocaBreve = 0, atrasados = 0, concluidos = 0, ativos = 0;
-    list.forEach(function (s) {
-      var st = computeStatus(s);
-      if (st.completed) concluidos++;
-      else {
-        ativos++;
-        if (st.delayDays > 0) atrasados++;
-        else if (st.daysToSwap <= 3) trocaBreve++;
-      }
-    });
-    var el = document.getElementById("stats");
-    el.innerHTML =
-      '<div class="stat"><div class="num mono">' + ativos + '</div><div class="label">Alunos ativos</div></div>' +
-      '<div class="stat warn"><div class="num mono">' + trocaBreve + '</div><div class="label">Trocam de treino em breve</div></div>' +
-      '<div class="stat danger"><div class="num mono">' + atrasados + '</div><div class="label">Atrasados para trocar treino</div></div>' +
-      '<div class="stat neutral"><div class="num mono">' + concluidos + '</div><div class="label">Planos concluídos</div></div>';
+  function urgencyScoreNutri(patient) {
+    var st = computeStatusNutri(patient);
+    if (patient.stage === "renovacao") {
+      return st.plan.hasReturn ? st.daysToNextConsulta : 100000;
+    }
+    return st.daysToParq;
   }
+
+  function stageIndex(stages, key) {
+    var i = stages.findIndex(function (s) { return s.key === key; });
+    return i === -1 ? 0 : i;
+  }
+
+  /* ---- Chrome (sidebar / header / vocab) ---- */
+
+  function refreshChrome() {
+    var cfg = CONFIG[currentWorkspace];
+    document.body.setAttribute("data-workspace", currentWorkspace);
+    document.querySelectorAll(".ws-btn").forEach(function (btn) {
+      btn.classList.toggle("active", btn.getAttribute("data-workspace") === currentWorkspace);
+    });
+    document.getElementById("eyebrow").textContent = "Gestão — " + cfg.role;
+    document.getElementById("brandTitle").textContent = cfg.brandTitle;
+    document.title = "Consultoria Online — " + cfg.role;
+    document.getElementById("navAlunos").textContent = cfg.personCapPlural;
+    document.getElementById("openAdd").textContent = cfg.addLabel;
+    document.getElementById("search").placeholder = cfg.searchPlaceholder;
+    document.getElementById("search").value = "";
+    document.getElementById("filterProduct").hidden = currentWorkspace !== "victor";
+    document.getElementById("filterProduct").value = "all";
+    document.getElementById("filterPlanNutri").hidden = currentWorkspace !== "gabi";
+    document.getElementById("filterPlanNutri").value = "all";
+    document.getElementById("sortStartOption").textContent = currentWorkspace === "victor"
+      ? "Ordenar: início mais recente"
+      : "Ordenar: consulta mais recente";
+    document.getElementById("gabiLogout").hidden = currentWorkspace !== "gabi";
+  }
+
+  function applyTabUI() {
+    var cfg = CONFIG[currentWorkspace];
+    document.querySelectorAll(".sidenav-btn").forEach(function (btn) {
+      btn.classList.toggle("active", btn.getAttribute("data-tab") === currentTab);
+    });
+    document.getElementById("viewAlunos").hidden = currentTab !== "alunos";
+    document.getElementById("viewKanban").hidden = currentTab !== "kanban";
+    document.getElementById("viewHeading").textContent = currentTab === "alunos" ? cfg.personCapPlural : "Acompanhamento";
+    document.getElementById("openAdd").hidden = currentTab !== "alunos";
+  }
+
+  function switchWorkspace(id) {
+    if (id === currentWorkspace || !CONFIG[id]) return;
+    currentWorkspace = id;
+    records = loadRecords(currentWorkspace);
+    uiState.workspace = id;
+    saveUIState(uiState);
+    refreshChrome();
+    applyTabUI();
+    render();
+    renderKanban();
+  }
+
+  function switchTab(tab) {
+    if (tab === currentTab) return;
+    currentTab = tab;
+    uiState.tab = tab;
+    saveUIState(uiState);
+    applyTabUI();
+    if (tab === "kanban") renderKanban();
+  }
+
+  document.getElementById("workspaceSwitch").addEventListener("click", function (e) {
+    var btn = e.target.closest(".ws-btn");
+    if (!btn) return;
+    var target = btn.getAttribute("data-workspace");
+    if (target === currentWorkspace) return;
+    if (target === "gabi" && !isGabiUnlocked()) {
+      openLogin();
+      return;
+    }
+    switchWorkspace(target);
+  });
+
+  document.getElementById("sidenav").addEventListener("click", function (e) {
+    var btn = e.target.closest(".sidenav-btn");
+    if (!btn) return;
+    switchTab(btn.getAttribute("data-tab"));
+  });
+
+  document.getElementById("gabiLogout").addEventListener("click", function () {
+    lockGabi();
+    switchWorkspace("victor");
+  });
+
+  /* ---- Login gate ---- */
+
+  function openLogin() {
+    document.getElementById("loginForm").reset();
+    document.getElementById("loginError").hidden = true;
+    document.getElementById("loginOverlay").hidden = false;
+    document.getElementById("loginUser").focus();
+  }
+  function closeLogin() {
+    document.getElementById("loginOverlay").hidden = true;
+  }
+
+  document.getElementById("loginCancel").addEventListener("click", closeLogin);
+  document.getElementById("loginForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var u = document.getElementById("loginUser").value.trim();
+    var p = document.getElementById("loginPass").value;
+    if (u === GABI_LOGIN.user && p === GABI_LOGIN.pass) {
+      unlockGabi();
+      closeLogin();
+      switchWorkspace("gabi");
+    } else {
+      document.getElementById("loginError").hidden = false;
+    }
+  });
+
+  /* ---- Stats ---- */
+
+  function renderStats() {
+    var el = document.getElementById("stats");
+    if (currentWorkspace === "victor") {
+      var trocaBreve = 0, atrasados = 0, concluidos = 0, ativos = 0;
+      records.forEach(function (s) {
+        var st = computeStatusTreino(s);
+        if (st.completed) concluidos++;
+        else {
+          ativos++;
+          if (st.delayDays > 0) atrasados++;
+          else if (st.daysToSwap <= 3) trocaBreve++;
+        }
+      });
+      el.innerHTML =
+        '<div class="stat"><div class="num mono">' + ativos + '</div><div class="label">Alunos ativos</div></div>' +
+        '<div class="stat warn"><div class="num mono">' + trocaBreve + '</div><div class="label">Trocam de treino em breve</div></div>' +
+        '<div class="stat danger"><div class="num mono">' + atrasados + '</div><div class="label">Atrasados para trocar treino</div></div>' +
+        '<div class="stat neutral"><div class="num mono">' + concluidos + '</div><div class="label">Planos concluídos</div></div>';
+    } else {
+      var parqBreve = 0, parqAtrasado = 0, emRenovacao = 0, ativosN = 0;
+      records.forEach(function (p) {
+        var st = computeStatusNutri(p);
+        if (p.stage === "renovacao") emRenovacao++;
+        else {
+          ativosN++;
+          if (st.daysToParq < 0) parqAtrasado++;
+          else if (st.daysToParq <= 3) parqBreve++;
+        }
+      });
+      el.innerHTML =
+        '<div class="stat"><div class="num mono">' + ativosN + '</div><div class="label">Pacientes ativos</div></div>' +
+        '<div class="stat warn"><div class="num mono">' + parqBreve + '</div><div class="label">PARQ para enviar em breve</div></div>' +
+        '<div class="stat danger"><div class="num mono">' + parqAtrasado + '</div><div class="label">PARQ atrasado</div></div>' +
+        '<div class="stat neutral"><div class="num mono">' + emRenovacao + '</div><div class="label">Em renovação</div></div>';
+    }
+  }
+
+  /* ---- Alunos / Pacientes list ---- */
 
   function render() {
+    renderStats();
+    if (currentWorkspace === "victor") renderTreinoList(); else renderNutriList();
+  }
+
+  function renderTreinoList() {
+    var cfg = CONFIG.victor;
     var query = document.getElementById("search").value.trim().toLowerCase();
     var productFilter = document.getElementById("filterProduct").value;
     var sortBy = document.getElementById("sortBy").value;
 
-    var filtered = students.filter(function (s) {
+    var filtered = records.filter(function (s) {
       var matchesQuery = s.name.toLowerCase().indexOf(query) !== -1;
       var matchesProduct = productFilter === "all" || s.product === productFilter;
       return matchesQuery && matchesProduct;
@@ -820,25 +1202,23 @@
     filtered.sort(function (a, b) {
       if (sortBy === "name") return a.name.localeCompare(b.name, "pt-BR");
       if (sortBy === "start") return parseDate(b.start) - parseDate(a.start);
-      return urgencyScore(a) - urgencyScore(b);
+      return urgencyScoreTreino(a) - urgencyScoreTreino(b);
     });
 
-    renderStats(students);
-
     var wrap = document.getElementById("listWrap");
-    if (students.length === 0) {
-      wrap.innerHTML = '<div class="empty"><strong>Nenhum aluno cadastrado ainda</strong>Clique em “Adicionar aluno” para começar a acompanhar treinos e planos.</div>';
+    if (records.length === 0) {
+      wrap.innerHTML = '<div class="empty"><strong>Nenhum ' + cfg.person + ' cadastrado ainda</strong>Clique em “' + cfg.addLabel + '” para começar a acompanhar treinos e planos.</div>';
       return;
     }
     if (filtered.length === 0) {
-      wrap.innerHTML = '<div class="empty">Nenhum aluno encontrado para essa busca.</div>';
+      wrap.innerHTML = '<div class="empty">Nenhum ' + cfg.person + ' encontrado para essa busca.</div>';
       return;
     }
 
     var html = '<div class="cards">';
     filtered.forEach(function (s) {
-      var st = computeStatus(s);
-      var plan = PLANS[s.plan] || PLANS.BASIC;
+      var st = computeStatusTreino(s);
+      var plan = PLANS_TREINO[s.plan] || PLANS_TREINO.BASIC;
       var product = PRODUCTS[s.product] || PRODUCTS.treino;
       var progressPct = Math.min(100, Math.round(((s.protocolNumber - 1) / st.totalProtocols) * 100));
 
@@ -901,98 +1281,147 @@
     wrap.innerHTML = html;
   }
 
-  function moveStudentToStage(id, stageKey) {
-    students = students.map(function (s) {
-      return s.id === id ? Object.assign({}, s, { stage: stageKey }) : s;
+  function renderNutriList() {
+    var cfg = CONFIG.gabi;
+    var query = document.getElementById("search").value.trim().toLowerCase();
+    var planFilter = document.getElementById("filterPlanNutri").value;
+    var sortBy = document.getElementById("sortBy").value;
+
+    var filtered = records.filter(function (p) {
+      var matchesQuery = p.name.toLowerCase().indexOf(query) !== -1;
+      var matchesPlan = planFilter === "all" || p.plan === planFilter;
+      return matchesQuery && matchesPlan;
+    });
+
+    filtered.sort(function (a, b) {
+      if (sortBy === "name") return a.name.localeCompare(b.name, "pt-BR");
+      if (sortBy === "start") return parseDate(b.consultaDate) - parseDate(a.consultaDate);
+      return urgencyScoreNutri(a) - urgencyScoreNutri(b);
+    });
+
+    var wrap = document.getElementById("listWrap");
+    if (records.length === 0) {
+      wrap.innerHTML = '<div class="empty"><strong>Nenhum ' + cfg.person + ' cadastrado ainda</strong>Clique em “' + cfg.addLabel + '” para começar o acompanhamento.</div>';
+      return;
+    }
+    if (filtered.length === 0) {
+      wrap.innerHTML = '<div class="empty">Nenhum ' + cfg.person + ' encontrado para essa busca.</div>';
+      return;
+    }
+
+    var html = '<div class="cards">';
+    filtered.forEach(function (p) {
+      var st = computeStatusNutri(p);
+      var stages = CONFIG.gabi.stages;
+      var idx = stageIndex(stages, p.stage);
+      var progressPct = Math.round((idx / (stages.length - 1)) * 100);
+
+      var parqCol = '<div class="value mono">' + fmtDate(st.parqDate) + '</div><div class="sub">' + daysLabel(st.daysToParq, "restantes", "atrás") + '</div>';
+
+      var nextCol = st.plan.hasReturn
+        ? '<div class="value mono">' + fmtDate(st.nextConsultaDate) + '</div><div class="sub">' + daysLabel(st.daysToNextConsulta, "restantes", "atrás") + '</div>'
+        : '<div class="value">—</div><div class="sub">consulta avulsa, sem retorno agendado</div>';
+
+      html += '<div class="card" data-id="' + p.id + '">' +
+        '<div class="card-head">' +
+          '<div>' +
+            '<div class="name">' + escapeHtml(p.name) + '</div>' +
+            '<div class="start-date">Consulta em: ' + fmtDate(parseDate(p.consultaDate)) + '</div>' +
+            '<div class="badges"><span class="badge plan">' + st.plan.label + '</span></div>' +
+          '</div>' +
+          '<div class="card-actions">' +
+            '<button class="btn small ghost" data-action="edit" data-id="' + p.id + '">Editar</button>' +
+            '<button class="btn small danger-outline" data-action="delete" data-id="' + p.id + '">Excluir</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="meta-grid">' +
+          '<div class="meta">' +
+            '<span class="field-label">Etapa atual</span>' +
+            '<div class="value">' + stages[idx].label + '</div>' +
+            '<div class="progress-track"><div class="progress-fill" style="width:' + progressPct + '%"></div></div>' +
+          '</div>' +
+          '<div class="meta">' +
+            '<span class="field-label">Envio do PARQ</span>' +
+            parqCol +
+          '</div>' +
+          '<div class="meta">' +
+            '<span class="field-label">Próxima consulta / renovação</span>' +
+            nextCol +
+          '</div>' +
+          '<div class="meta">' +
+            '<span class="field-label">Status</span>' +
+            '<span class="chip ' + st.state + '">' + st.label + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    });
+    html += '</div>';
+    wrap.innerHTML = html;
+  }
+
+  /* ---- Kanban ---- */
+
+  function moveRecordToStage(id, stageKey) {
+    records = records.map(function (r) {
+      return r.id === id ? Object.assign({}, r, { stage: stageKey }) : r;
     });
     persist();
     renderKanban();
   }
 
+  function kanbanCardTreino(s) {
+    var st = computeStatusTreino(s);
+    var plan = PLANS_TREINO[s.plan] || PLANS_TREINO.BASIC;
+    var product = PRODUCTS[s.product] || PRODUCTS.treino;
+    var options = STAGES_TREINO.map(function (opt) {
+      return '<option value="' + opt.key + '"' + (opt.key === s.stage ? ' selected' : '') + '>' + opt.label + '</option>';
+    }).join("");
+    return '<div class="kanban-card" draggable="true" data-id="' + s.id + '">' +
+      '<div class="kc-name">' + escapeHtml(s.name) + '</div>' +
+      '<div class="kc-badges">' +
+        '<span class="badge plan">' + plan.label + '</span>' +
+        '<span class="badge ' + product.cls + '">' + product.badge + '</span>' +
+      '</div>' +
+      '<span class="chip ' + st.state + '">' + st.label + '</span>' +
+      '<label class="kc-move"><span class="field-label">Mover para</span>' +
+        '<select class="kc-move-select" data-id="' + s.id + '">' + options + '</select>' +
+      '</label>' +
+    '</div>';
+  }
+
+  function kanbanCardNutri(p) {
+    var st = computeStatusNutri(p);
+    var options = STAGES_NUTRI.map(function (opt) {
+      return '<option value="' + opt.key + '"' + (opt.key === p.stage ? ' selected' : '') + '>' + opt.label + '</option>';
+    }).join("");
+    return '<div class="kanban-card" draggable="true" data-id="' + p.id + '">' +
+      '<div class="kc-name">' + escapeHtml(p.name) + '</div>' +
+      '<div class="kc-badges"><span class="badge plan">' + st.plan.label + '</span></div>' +
+      '<div class="kc-sub">Consulta: ' + fmtDate(parseDate(p.consultaDate)) + '</div>' +
+      '<span class="chip ' + st.state + '">' + st.label + '</span>' +
+      '<label class="kc-move"><span class="field-label">Mover para</span>' +
+        '<select class="kc-move-select" data-id="' + p.id + '">' + options + '</select>' +
+      '</label>' +
+    '</div>';
+  }
+
   function renderKanban() {
     var board = document.getElementById("kanbanBoard");
-    if (students.length === 0) {
-      board.innerHTML = '<div class="empty"><strong>Nenhum aluno cadastrado ainda</strong>Adicione um aluno na aba "Alunos" para vê-lo aqui.</div>';
+    var cfg = CONFIG[currentWorkspace];
+    if (records.length === 0) {
+      board.innerHTML = '<div class="empty"><strong>Nenhum ' + cfg.person + ' cadastrado ainda</strong>Adicione em "' + cfg.personCapPlural + '" para ver aqui.</div>';
       return;
     }
-    board.innerHTML = STAGES.map(function (stage) {
-      var list = students.filter(function (s) { return (s.stage || "ativo") === stage.key; });
-      var cardsHtml = list.map(function (s) {
-        var st = computeStatus(s);
-        var plan = PLANS[s.plan] || PLANS.BASIC;
-        var product = PRODUCTS[s.product] || PRODUCTS.treino;
-        var options = STAGES.map(function (opt) {
-          return '<option value="' + opt.key + '"' + (opt.key === stage.key ? ' selected' : '') + '>' + opt.label + '</option>';
-        }).join("");
-        return '<div class="kanban-card" draggable="true" data-id="' + s.id + '">' +
-          '<div class="kc-name">' + escapeHtml(s.name) + '</div>' +
-          '<div class="kc-badges">' +
-            '<span class="badge plan">' + plan.label + '</span>' +
-            '<span class="badge ' + product.cls + '">' + product.badge + '</span>' +
-          '</div>' +
-          '<span class="chip ' + st.state + '">' + st.label + '</span>' +
-          '<label class="kc-move">' +
-            '<span class="field-label">Mover para</span>' +
-            '<select class="kc-move-select" data-id="' + s.id + '">' + options + '</select>' +
-          '</label>' +
-        '</div>';
-      }).join("");
+    var cardFn = currentWorkspace === "victor" ? kanbanCardTreino : kanbanCardNutri;
+    board.innerHTML = cfg.stages.map(function (stage) {
+      var list = records.filter(function (r) { return (r.stage || cfg.stages[0].key) === stage.key; });
+      var cardsHtml = list.map(cardFn).join("");
       return '<div class="kanban-col" data-stage="' + stage.key + '">' +
         '<div class="kanban-col-head"><span>' + stage.label + '</span><span class="kanban-count">' + list.length + '</span></div>' +
-        '<div class="kanban-cards">' + (cardsHtml || '<div class="kanban-empty">Sem alunos aqui</div>') + '</div>' +
+        '<div class="kanban-cards">' + (cardsHtml || '<div class="kanban-empty">Sem ' + cfg.personCapPlural.toLowerCase() + ' aqui</div>') + '</div>' +
       '</div>';
     }).join("");
   }
-
-  function applyWorkspaceUI() {
-    document.body.setAttribute("data-workspace", currentWorkspace);
-    document.querySelectorAll(".ws-btn").forEach(function (btn) {
-      btn.classList.toggle("active", btn.getAttribute("data-workspace") === currentWorkspace);
-    });
-    var label = WORKSPACES[currentWorkspace].label;
-    document.getElementById("eyebrow").textContent = "Gestão de alunos — espaço de " + label;
-    document.title = "Consultoria Online — " + label;
-  }
-
-  function applyTabUI() {
-    document.querySelectorAll(".subtab-btn").forEach(function (btn) {
-      btn.classList.toggle("active", btn.getAttribute("data-tab") === currentTab);
-    });
-    document.getElementById("viewAlunos").hidden = currentTab !== "alunos";
-    document.getElementById("viewKanban").hidden = currentTab !== "kanban";
-  }
-
-  function switchWorkspace(id) {
-    if (id === currentWorkspace || !WORKSPACES[id]) return;
-    currentWorkspace = id;
-    students = loadStudents(currentWorkspace);
-    uiState.workspace = id;
-    saveUIState(uiState);
-    applyWorkspaceUI();
-    render();
-    renderKanban();
-  }
-
-  function switchTab(tab) {
-    if (tab === currentTab) return;
-    currentTab = tab;
-    uiState.tab = tab;
-    saveUIState(uiState);
-    applyTabUI();
-    if (tab === "kanban") renderKanban();
-  }
-
-  document.getElementById("workspaceSwitch").addEventListener("click", function (e) {
-    var btn = e.target.closest(".ws-btn");
-    if (!btn) return;
-    switchWorkspace(btn.getAttribute("data-workspace"));
-  });
-
-  document.getElementById("subtabs").addEventListener("click", function (e) {
-    var btn = e.target.closest(".subtab-btn");
-    if (!btn) return;
-    switchTab(btn.getAttribute("data-tab"));
-  });
 
   var kanbanBoard = document.getElementById("kanbanBoard");
   kanbanBoard.addEventListener("dragstart", function (e) {
@@ -1022,13 +1451,15 @@
     e.preventDefault();
     col.classList.remove("drag-over");
     var id = e.dataTransfer.getData("text/plain");
-    if (id) moveStudentToStage(id, col.getAttribute("data-stage"));
+    if (id) moveRecordToStage(id, col.getAttribute("data-stage"));
   });
   kanbanBoard.addEventListener("change", function (e) {
     var sel = e.target.closest(".kc-move-select");
     if (!sel) return;
-    moveStudentToStage(sel.getAttribute("data-id"), sel.value);
+    moveRecordToStage(sel.getAttribute("data-id"), sel.value);
   });
+
+  /* ---- Add / edit dialog ---- */
 
   var dialog = document.getElementById("formDialog");
   var form = document.getElementById("studentForm");
@@ -1036,14 +1467,7 @@
   var protocolNumberInput = document.getElementById("fProtocolNumber");
   var startInput = document.getElementById("fStart");
   var protocolStartInput = document.getElementById("fProtocolStart");
-
-  populatePlanSelect(planSelect);
-
-  planSelect.addEventListener("change", function () {
-    var max = PLANS[planSelect.value].protocols;
-    protocolNumberInput.max = max;
-    if (parseInt(protocolNumberInput.value, 10) > max) protocolNumberInput.value = max;
-  });
+  var consultaDateInput = document.getElementById("fConsultaDate");
 
   startInput.addEventListener("change", function () {
     if (!protocolStartInput.dataset.touched) {
@@ -1054,17 +1478,41 @@
     protocolStartInput.dataset.touched = "1";
   });
 
+  planSelect.addEventListener("change", function () {
+    if (currentWorkspace !== "victor") return;
+    var max = PLANS_TREINO[planSelect.value].protocols;
+    protocolNumberInput.max = max;
+    if (parseInt(protocolNumberInput.value, 10) > max) protocolNumberInput.value = max;
+  });
+
   document.getElementById("openAdd").addEventListener("click", function () {
+    var cfg = CONFIG[currentWorkspace];
     form.reset();
     document.getElementById("editId").value = "";
-    planSelect.value = "BASIC";
-    protocolNumberInput.value = 1;
-    protocolNumberInput.max = PLANS.BASIC.protocols;
-    delete protocolStartInput.dataset.touched;
+    populatePlanSelect(planSelect, currentWorkspace);
     var today = toInputValue(todayStart());
-    startInput.value = today;
-    protocolStartInput.value = today;
-    document.getElementById("dialogTitle").textContent = "Adicionar aluno";
+
+    if (currentWorkspace === "victor") {
+      document.getElementById("victorFields").hidden = false;
+      document.getElementById("gabiFields").hidden = true;
+      document.getElementById("hintTreino").hidden = false;
+      document.getElementById("hintNutri").hidden = true;
+      planSelect.value = PLAN_ORDER_TREINO[0];
+      protocolNumberInput.value = 1;
+      protocolNumberInput.max = PLANS_TREINO[PLAN_ORDER_TREINO[0]].protocols;
+      delete protocolStartInput.dataset.touched;
+      startInput.value = today;
+      protocolStartInput.value = today;
+    } else {
+      document.getElementById("victorFields").hidden = true;
+      document.getElementById("gabiFields").hidden = false;
+      document.getElementById("hintTreino").hidden = true;
+      document.getElementById("hintNutri").hidden = false;
+      planSelect.value = PLAN_ORDER_NUTRI[0];
+      consultaDateInput.value = today;
+    }
+
+    document.getElementById("dialogTitle").textContent = cfg.addDialogTitle;
     dialog.showModal();
   });
 
@@ -1074,23 +1522,36 @@
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
+    var cfg = CONFIG[currentWorkspace];
     var id = document.getElementById("editId").value;
-    var existing = id ? students.find(function (s) { return s.id === id; }) : null;
-    var record = {
-      id: id || String(Date.now()),
-      name: document.getElementById("fName").value.trim(),
-      product: document.getElementById("fProduct").value,
-      plan: planSelect.value,
-      start: startInput.value,
-      protocolNumber: Math.max(1, parseInt(protocolNumberInput.value, 10) || 1),
-      protocolStart: protocolStartInput.value,
-      stage: existing ? (existing.stage || "onboarding") : "onboarding"
-    };
+    var existing = id ? records.find(function (r) { return r.id === id; }) : null;
+    var record;
+
+    if (currentWorkspace === "victor") {
+      record = {
+        id: id || String(Date.now()),
+        name: document.getElementById("fName").value.trim(),
+        product: document.getElementById("fProduct").value,
+        plan: planSelect.value,
+        start: startInput.value || toInputValue(todayStart()),
+        protocolNumber: Math.max(1, parseInt(protocolNumberInput.value, 10) || 1),
+        protocolStart: protocolStartInput.value || startInput.value,
+        stage: existing ? (existing.stage || cfg.stages[0].key) : cfg.stages[0].key
+      };
+    } else {
+      record = {
+        id: id || String(Date.now()),
+        name: document.getElementById("fName").value.trim(),
+        plan: planSelect.value,
+        consultaDate: consultaDateInput.value || toInputValue(todayStart()),
+        stage: existing ? (existing.stage || cfg.stages[0].key) : cfg.stages[0].key
+      };
+    }
 
     if (id) {
-      students = students.map(function (s) { return s.id === id ? record : s; });
+      records = records.map(function (r) { return r.id === id ? record : r; });
     } else {
-      students.push(record);
+      records.push(record);
     }
     persist();
     dialog.close();
@@ -1103,33 +1564,49 @@
     if (!btn) return;
     var id = btn.getAttribute("data-id");
     var action = btn.getAttribute("data-action");
+    var cfg = CONFIG[currentWorkspace];
 
     if (action === "delete") {
-      if (confirm("Excluir este aluno da lista?")) {
-        students = students.filter(function (s) { return s.id !== id; });
+      if (confirm("Excluir este " + cfg.person + " da lista?")) {
+        records = records.filter(function (r) { return r.id !== id; });
         persist();
         render();
       }
     } else if (action === "edit") {
-      var s = students.find(function (s) { return s.id === id; });
-      if (!s) return;
-      document.getElementById("editId").value = s.id;
-      document.getElementById("fName").value = s.name;
-      document.getElementById("fProduct").value = s.product;
-      planSelect.value = s.plan;
-      protocolNumberInput.max = PLANS[s.plan].protocols;
-      startInput.value = s.start;
-      protocolNumberInput.value = s.protocolNumber;
-      protocolStartInput.value = s.protocolStart;
-      protocolStartInput.dataset.touched = "1";
-      document.getElementById("dialogTitle").textContent = "Editar aluno";
+      var r = records.find(function (x) { return x.id === id; });
+      if (!r) return;
+      document.getElementById("editId").value = r.id;
+      document.getElementById("fName").value = r.name;
+      populatePlanSelect(planSelect, currentWorkspace);
+      planSelect.value = r.plan;
+
+      if (currentWorkspace === "victor") {
+        document.getElementById("victorFields").hidden = false;
+        document.getElementById("gabiFields").hidden = true;
+        document.getElementById("hintTreino").hidden = false;
+        document.getElementById("hintNutri").hidden = true;
+        document.getElementById("fProduct").value = r.product;
+        protocolNumberInput.max = PLANS_TREINO[r.plan].protocols;
+        startInput.value = r.start;
+        protocolNumberInput.value = r.protocolNumber;
+        protocolStartInput.value = r.protocolStart;
+        protocolStartInput.dataset.touched = "1";
+      } else {
+        document.getElementById("victorFields").hidden = true;
+        document.getElementById("gabiFields").hidden = false;
+        document.getElementById("hintTreino").hidden = true;
+        document.getElementById("hintNutri").hidden = false;
+        consultaDateInput.value = r.consultaDate;
+      }
+
+      document.getElementById("dialogTitle").textContent = cfg.editDialogTitle;
       dialog.showModal();
     } else if (action === "swap") {
       var swapDialog = document.getElementById("swapDialog");
       document.getElementById("swapId").value = id;
       document.getElementById("swapDate").value = toInputValue(todayStart());
-      var st2 = students.find(function (s) { return s.id === id; });
-      var willComplete = st2 && st2.protocolNumber >= PLANS[st2.plan].protocols;
+      var st2 = records.find(function (s) { return s.id === id; });
+      var willComplete = st2 && st2.protocolNumber >= PLANS_TREINO[st2.plan].protocols;
       document.getElementById("swapTitle").textContent = willComplete ? "Concluir plano" : "Confirmar troca de treino";
       swapDialog.showModal();
     }
@@ -1143,7 +1620,7 @@
     e.preventDefault();
     var id = document.getElementById("swapId").value;
     var date = document.getElementById("swapDate").value;
-    students = students.map(function (s) {
+    records = records.map(function (s) {
       if (s.id !== id) return s;
       return Object.assign({}, s, {
         protocolNumber: s.protocolNumber + 1,
@@ -1158,9 +1635,10 @@
 
   document.getElementById("search").addEventListener("input", render);
   document.getElementById("filterProduct").addEventListener("change", render);
+  document.getElementById("filterPlanNutri").addEventListener("change", render);
   document.getElementById("sortBy").addEventListener("change", render);
 
-  applyWorkspaceUI();
+  refreshChrome();
   applyTabUI();
   render();
   renderKanban();
