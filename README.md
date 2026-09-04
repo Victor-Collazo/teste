@@ -2,6 +2,8 @@
 
 Ferramenta simples (um único arquivo HTML) com dois espaços de trabalho — **Treinador** e **Nutricionista** — cada um com seus próprios cadastros, planos e quadro de acompanhamento.
 
+> Landing page de vendas da consultoria (Victor Collazo + Gabriela Padial) fica em [`landing/`](landing/README.md), como projeto separado deste painel.
+
 ## Como usar
 
 Abra `index.html` em qualquer navegador — não precisa de servidor, build ou instalação. A página inteira pede usuário e senha antes de mostrar qualquer coisa (veja "Acesso à página" abaixo). Depois de entrar: a troca **Treinador / Nutricionista** fica no canto superior direito; as abas "Alunos"/"Pacientes" e "Acompanhamento" ficam na barra lateral esquerda.
