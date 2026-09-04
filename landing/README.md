@@ -12,8 +12,10 @@ rápido (HTML único, sem framework).
 - `images/` — fotos do casal usadas no hero, na seção de acompanhamento e no CTA final
 
 ## Identidade visual
-- Paleta: bege (`#F7F4EE`), verde pinho (`#1F3D2B`), dourado (`#B99458`)
-- Tipografia: Playfair Display (títulos), Cormorant Garamond (detalhes serifados), DM Sans (texto corrido)
+- Design escuro e editorial, inspirado em estúdios boutique de alto padrão (Equinox, Solo60, SIX) — clima de "clube privado", não de academia
+- Paleta: quase-preto (`#12140F`), bege claro (`#ECE7DD`), bronze metálico (`#B3865A`) — único acento, alto contraste no CTA
+- Tipografia: Fraunces (títulos serifados, peso 500-600 com itálico em destaque), Manrope (texto corrido), IBM Plex Mono (rótulos, números de protocolo — reforça o tema de acompanhamento/dados)
+- Fotos tratadas como retrato emoldurado (moldura + legenda estilo galeria), aproveitando o fundo claro de estúdio das fotos originais contra o fundo escuro da página
 - Sem travessões no texto (preferência do cliente)
 
 ## Decisões de conversão já tomadas
