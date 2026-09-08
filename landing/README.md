@@ -15,7 +15,7 @@ rápido (HTML único, sem framework).
 - Design claro e editorial, inspirado em estúdios boutique de alto padrão (Equinox, Solo60, SIX) — clima de "clube privado", não de academia
 - Paleta: papel claro (`#F2EFE6`), branco (`#FFFFFF`), bronze escuro (`#8B5A2E`) — único acento, escolhido escuro o bastante para ter contraste em texto sobre fundo claro
 - Tipografia: Fraunces (títulos serifados, peso 500-600 com itálico em destaque), Manrope (texto corrido), IBM Plex Mono (rótulos, números de protocolo — reforça o tema de acompanhamento/dados)
-- Fotos tratadas como retrato emoldurado (moldura branca + sombra + legenda estilo galeria), já que o fundo de estúdio das fotos originais também é claro
+- Fotos sem moldura: hero em imagem cheia (edge-to-edge, logo abaixo do bloco de texto), e as demais fotos aparecem soltas na página, só com uma sombra suave para se destacarem do fundo
 - Marca "Consultoria Premium" (selo "CP" + nome) no lugar do nome pessoal no topo da página e no rodapé — "Collazo & Padial" aparece como subtítulo discreto
 - Sem travessões no texto (preferência do cliente)
 
