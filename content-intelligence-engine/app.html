@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Intelligence Engine</title>
+<style>
+  :root {
+    --bg: #0e0f12;
+    --panel: #17181d;
+    --panel-2: #1e2027;
+    --border: #2a2c34;
+    --text: #e8e9ec;
+    --muted: #9a9ca6;
+    --accent: #6c5ce7;
+    --accent-2: #00d3a7;
+    --danger: #ff5c5c;
+    --warn: #ffb454;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+  }
+  header {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  header h1 {
+    font-size: 18px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  header h1 .dot { color: var(--accent); }
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 10px 24px 0;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+  }
+  .tab-btn.active {
+    color: var(--text);
+    border-bottom-color: var(--accent);
+  }
+  main {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  .view { display: none; }
+  .view.active { display: block; }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card h2 {
+    font-size: 15px;
+    margin: 0 0 14px;
+    color: var(--text);
+  }
+  .card h2 .step-badge {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-right: 8px;
+  }
+  label {
+    display: block;
+    font-size: 12.5px;
+    color: var(--muted);
+    margin: 12px 0 5px;
+  }
+  label:first-of-type { margin-top: 0; }
+  input[type=text], input[type=password], input[type=number], textarea, select {
+    width: 100%;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13.5px;
+    font-family: inherit;
+    resize: vertical;
+  }
+  textarea { min-height: 110px; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .row > div { flex: 1; min-width: 200px; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  button.btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 600;
+    margin-top: 14px;
+  }
+  button.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  button.btn.secondary {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  button.btn.danger { background: var(--danger); }
+  button.btn.small { padding: 6px 12px; font-size: 12.5px; margin-top: 0; }
+  .stage-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .stage-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--panel-2);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .stage-row .icon { width: 18px; text-align: center; }
+  .stage-row.pending .icon { color: var(--muted); }
+  .stage-row.running .icon { color: var(--warn); }
+  .stage-row.done .icon { color: var(--accent-2); }
+  .stage-row.error .icon { color: var(--danger); }
+  .stage-row .name { flex: 1; font-size: 13.5px; }
+  .stage-row .status { font-size: 12px; color: var(--muted); }
+  .output-block {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-top: 10px;
+    font-size: 13.5px;
+    max-height: 480px;
+    overflow-y: auto;
+  }
+  .output-block h1, .output-block h2, .output-block h3, .output-block h4 {
+    margin: 14px 0 6px;
+    color: var(--accent-2);
+    font-size: 14px;
+  }
+  .output-block h1:first-child, .output-block h2:first-child, .output-block h3:first-child { margin-top: 0; }
+  .output-block ul, .output-block ol { margin: 6px 0; padding-left: 20px; }
+  .output-block p { margin: 6px 0; }
+  .output-block strong { color: #fff; }
+  details.output-wrap { margin-top: 10px; }
+  details.output-wrap > summary {
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--muted);
+    padding: 6px 0;
+  }
+  .analysis-item {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    background: var(--panel-2);
+  }
+  .analysis-item .top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .analysis-item .top .title { font-weight: 600; font-size: 14px; }
+  .analysis-item .top .date { font-size: 12px; color: var(--muted); }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    margin-right: 6px;
+  }
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    max-width: 360px;
+    z-index: 999;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .toast.error { border-color: var(--danger); }
+  .empty-state {
+    text-align: center;
+    color: var(--muted);
+    padding: 40px 20px;
+    font-size: 13.5px;
+  }
+  .config-status {
+    font-size: 12.5px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+  .config-status.ok { background: rgba(0,211,167,0.1); color: var(--accent-2); }
+  .config-status.missing { background: rgba(255,92,92,0.1); color: var(--danger); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span class="dot">◆</span> Content Intelligence Engine</h1>
+  <div class="hint">MVP — modele o mecanismo, não copie o conteúdo.</div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" data-view="config">Configuração</button>
+  <button class="tab-btn" data-view="analisar">1. Analisar Conteúdo</button>
+  <button class="tab-btn" data-view="gerar">2. Gerar Ideias</button>
+  <button class="tab-btn" data-view="avaliar">3. Avaliar (Score)</button>
+  <button class="tab-btn" data-view="banco">Banco de Ideias</button>
+</div>
+
+<main>
+
+  <!-- CONFIG -->
+  <div class="view active" id="view-config">
+    <div class="card">
+      <h2>API da Anthropic (Claude)</h2>
+      <p class="hint">Essa ferramenta roda 100% no seu navegador — não existe servidor por trás. Sua chave fica salva apenas no <code>localStorage</code> deste navegador e é enviada direto para a API da Anthropic a cada análise. Nunca compartilhe essa chave.</p>
+      <label>API Key (começa com <code>sk-ant-...</code>)</label>
+      <input type="password" id="cfg-apikey" placeholder="sk-ant-...">
+      <label>Modelo</label>
+      <input type="text" id="cfg-model" placeholder="claude-sonnet-5">
+      <p class="hint">Se a chamada falhar com erro de modelo desconhecido, troque para outro identificador de modelo válido na sua conta.</p>
+      <button class="btn" id="cfg-save">Salvar configuração</button>
+      <div id="cfg-status"></div>
+    </div>
+    <div class="card">
+      <h2>Como funciona o pipeline</h2>
+      <p class="hint">
+        <strong>Entrada:</strong> você cola a transcrição/fala de um vídeo que já performou bem (Instagram, TikTok, YouTube etc.) — copiada manualmente por você.<br><br>
+        <strong>Inteligência:</strong> Transcrição Estruturada → Autópsia Completa → DNA Estratégico → SEO Social.<br><br>
+        <strong>Criação:</strong> a partir do DNA, você informa seu nicho/público/objetivo e a IA gera ideias originais + matriz de possibilidades.<br><br>
+        <strong>Otimização:</strong> cada ideia pode receber um Score (0-100) ponderado pelo seu objetivo (viralização, vendas ou SEO), com sugestão de versão otimizada.<br><br>
+        Tudo fica salvo no "Banco de Ideias" (também no seu navegador).
+      </p>
+    </div>
+  </div>
+
+  <!-- ANALISAR -->
+  <div class="view" id="view-analisar">
+    <div class="card">
+      <h2>Conteúdo de referência</h2>
+      <label>Rótulo desta análise (para achar depois no Banco de Ideias)</label>
+      <input type="text" id="an-label" placeholder="Ex: @concorrente - reel sobre erro de treino">
+      <label>Transcrição / fala do vídeo (cole aqui)</label>
+      <textarea id="an-transcript" placeholder="Cole aqui a transcrição do vídeo, com timestamps se tiver..."></textarea>
+      <label>Contexto adicional (opcional)</label>
+      <textarea id="an-context" style="min-height:70px" placeholder="Ex: plataforma (Instagram Reels), nicho do criador, métricas se souber (views, média do perfil), duração do vídeo..."></textarea>
+      <p class="hint">Lembrete: números de visualização/curtidas são sinais, não prova de causalidade — a IA foi instruída a tratá-los assim.</p>
+      <button class="btn" id="an-run">Rodar Autópsia Completa</button>
+    </div>
+
+    <div class="card" id="an-progress-card" style="display:none">
+      <h2>Progresso</h2>
+      <div class="stage-list" id="an-stage-list"></div>
+    </div>
+
+    <div id="an-results"></div>
+  </div>
+
+  <!-- GERAR IDEIAS -->
+  <div class="view" id="view-gerar">
+    <div class="card">
+      <h2>Escolha a análise-base</h2>
+      <label>Análise (DNA + SEO já extraídos)</label>
+      <select id="gi-analysis"></select>
+      <div class="hint" id="gi-analysis-empty" style="display:none">Nenhuma análise ainda. Vá na aba "1. Analisar Conteúdo" primeiro.</div>
+    </div>
+
+    <div class="card">
+      <h2>Briefing de criação</h2>
+      <div class="row">
+        <div><label>Nicho</label><input type="text" id="gi-nicho" placeholder="Ex: personal trainer"></div>
+        <div><label>Público</label><input type="text" id="gi-publico" placeholder="Ex: empresários 30-45"></div>
+      </div>
+      <div class="row">
+        <div><label>Objetivo</label>
+          <select id="gi-objetivo">
+            <option value="Viralização">Viralização</option>
+            <option value="Vendas">Vendas</option>
+            <option value="SEO/Descoberta">SEO/Descoberta</option>
+            <option value="Autoridade">Autoridade</option>
+          </select>
+        </div>
+        <div><label>Tom de voz</label><input type="text" id="gi-tom" placeholder="Ex: direto, sofisticado, sem clichês"></div>
+      </div>
+      <div class="row">
+        <div><label>Produto/serviço (opcional)</label><input type="text" id="gi-produto" placeholder="Ex: consultoria online"></div>
+        <div><label>Tema desejado (opcional)</label><input type="text" id="gi-tema" placeholder="Ex: erros de dieta"></div>
+      </div>
+      <label>Posicionamento (opcional)</label>
+      <input type="text" id="gi-posicionamento" placeholder="Ex: autoridade técnica com humor ácido">
+      <button class="btn" id="gi-run">Gerar Ideias Originais</button>
+      <button class="btn secondary" id="gi-run-matriz">Gerar Matriz de Possibilidades</button>
+    </div>
+
+    <div id="gi-results"></div>
+  </div>
+
+  <!-- AVALIAR / SCORE -->
+  <div class="view" id="view-avaliar">
+    <div class="card">
+      <h2>Avaliar uma ideia (Viral Score)</h2>
+      <label>Cole aqui a ideia/roteiro que quer avaliar</label>
+      <textarea id="sc-idea" placeholder="Cole o hook, estrutura, CTA etc. da ideia que você quer pontuar..."></textarea>
+      <label>Objetivo (define o peso de cada critério)</label>
+      <select id="sc-objetivo">
+        <option value="Viralização">Viralização</option>
+        <option value="Vendas">Vendas</option>
+        <option value="SEO/Descoberta">SEO/Descoberta</option>
+      </select>
+      <button class="btn" id="sc-run">Calcular Score</button>
+    </div>
+    <div id="sc-results"></div>
+  </div>
+
+  <!-- BANCO DE IDEIAS -->
+  <div class="view" id="view-banco">
+    <div class="card">
+      <h2>Banco de Análises e Ideias</h2>
+      <input type="text" id="bank-search" placeholder="Buscar por rótulo, nicho ou tema...">
+    </div>
+    <div id="bank-list"></div>
+  </div>
+
+</main>
+
+<script>
+/* ============ PROMPTS ============ */
+
+const PROMPT_SYSTEM_CORE = `Você é o Content Intelligence Engine, o motor de inteligência de conteúdo da plataforma.
+
+Sua função não é copiar conteúdos existentes. Sua função é analisar conteúdos que já foram publicados, identificar os padrões, mecanismos, estruturas, gatilhos, estratégias de retenção, elementos de SEO e características que podem ter contribuído para sua performance e transformar esse aprendizado em inteligência acionável para criação de conteúdo ORIGINAL.
+
+PRINCÍPIO CENTRAL:
+NÃO COPIE. NÃO PARAFRASEIE. NÃO REPRODUZA. NÃO MANTENHA A MESMA ESTRUTURA QUANDO ISSO RESULTAR EM UMA CÓPIA DISFARÇADA.
+MODELE O MECANISMO.
+
+Você deve separar: 1. O QUE foi dito. 2. COMO foi dito. 3. POR QUE provavelmente funcionou. 4. QUAL mecanismo pode ser reaplicado. 5. COMO utilizar esse mecanismo em um contexto novo e original.
+
+DIFERENCIE SEMPRE:
+FATO: algo observável diretamente no conteúdo.
+INFERÊNCIA: uma hipótese razoável baseada nos elementos observados.
+HIPÓTESE: uma explicação possível para a performance que não pode ser comprovada apenas pelo conteúdo.
+Nunca apresente uma hipótese como fato. Visualizações, curtidas, comentários e compartilhamentos são sinais, não provas isoladas de causalidade.
+
+Pense como estrategista de conteúdo, roteirista, especialista em retenção, especialista em comportamento, especialista em SEO para plataformas sociais, analista de dados, diretor criativo, social media e pesquisador de tendências.
+
+Priorize sempre INSIGHTS ACIONÁVEIS, nunca observações vagas.
+
+Quando gerar novas ideias, preserve o MECANISMO, mas altere assunto, contexto, exemplos, argumentos, narrativa, linguagem, promessa, perspectiva e aplicação. O resultado final deve parecer ter sido criado pelo novo autor, e não adaptado do conteúdo analisado.
+
+REGRA DE OURO: copie o APRENDIZADO. Não copie o CONTEÚDO.
+
+Responda sempre em português do Brasil, usando markdown simples (##, **, -, listas numeradas) para organizar a resposta.`;
+
+const PROMPT_TRANSCRICAO = `Analise o conteúdo fornecido e produza uma transcrição estruturada.
+
+Não apenas transcreva as palavras. Identifique também o papel estratégico de cada trecho. Divida o conteúdo em blocos cronológicos (use os timestamps se estiverem presentes no texto original; se não houver, divida em blocos lógicos numerados).
+
+Para cada bloco informe: Timestamp inicial, Timestamp final (ou posição no texto), Texto falado, Função daquele trecho, Emoção predominante, Objetivo estratégico, Elemento de retenção utilizado, Informação nova apresentada, Relação com o trecho anterior, Relação com o próximo trecho.
+
+Classifique cada trecho, quando aplicável, como: HOOK, CONTEXT, PROBLEM, CURIOSITY, STORY, PROOF, INSIGHT, CONTRAST, SOLUTION, CTA, OTHER.
+
+Depois produza: 1. Transcrição completa. 2. Estrutura resumida. 3. Frase mais importante. 4. Hook identificado. 5. CTA identificado. 6. Momento em que o vídeo entrega sua principal promessa. 7. Momentos em que existe potencial de queda de retenção. 8. Momentos de maior potencial de retenção.
+
+Não altere o conteúdo original dentro da transcrição. A análise estratégica deve ser separada da transcrição.`;
+
+const PROMPT_AUTOPSIA = `Faça uma autópsia completa do conteúdo analisado (use a transcrição estruturada fornecida como base). Seu objetivo é descobrir POR QUE esse conteúdo pode ter funcionado.
+
+1. HOOK: tipo, estrutura, promessa, curiosity gap, quebra de expectativa, nível de especificidade, clareza, força nos primeiros 3 segundos. Dê uma nota de 0-100.
+2. RETENÇÃO: velocidade de entrega da informação, densidade de informação, open loops, mudanças de assunto, pattern interrupts, progressão narrativa, curiosidade, momentos de recompensa. Identifique possíveis pontos de queda de retenção.
+3. EMOÇÃO: principais emoções utilizadas (curiosidade, surpresa, medo, desejo, identificação, indignação, humor, inspiração, urgência).
+4. PSICOLOGIA: mecanismos psicológicos presentes.
+5. ESTRUTURA: arquitetura do conteúdo sem reproduzir suas frases (ex: "Quebra de crença → consequência → exemplo → explicação → solução → CTA").
+6. CTA: tipo, clareza, fricção, incentivo, adequação ao objetivo.
+7. POTENCIAL DE COMPARTILHAMENTO: por que alguém enviaria isso para outra pessoa.
+8. POTENCIAL DE SALVAMENTO: por que alguém guardaria o conteúdo.
+9. POTENCIAL DE COMENTÁRIOS: elementos que podem gerar debate ou resposta.
+10. POTENCIAL DE BUSCA: possíveis intenções de busca relacionadas ao assunto.
+
+No final, entregue um DIAGNÓSTICO: "Este conteúdo provavelmente funciona porque..." e liste os 5 mecanismos mais importantes em ordem de relevância. Não trate nenhuma hipótese de performance como certeza.`;
+
+const PROMPT_DNA = `Transforme a análise do conteúdo (autópsia fornecida) em seu DNA estratégico. NÃO reproduza o conteúdo. Extraia apenas os padrões reutilizáveis.
+
+Entregue: DNA DO HOOK (fórmula estrutural), DNA DA PROMESSA (transformação/descoberta/benefício prometido), DNA DA CURIOSIDADE (informação incompleta usada para incentivar continuidade), DNA DA NARRATIVA (sequência lógica), DNA DA EMOÇÃO (emoção principal), DNA DA AUTORIDADE (como constrói credibilidade), DNA DA PROVA (demonstração/exemplo/experiência/dado/resultado), DNA DA RETENÇÃO (mecanismos que mantêm a atenção), DNA DO CTA (comportamento desejado), DNA DO FORMATO (classifique: opinião, tutorial, storytelling, lista, reação, comparação, transformação, estudo de caso, entrevista, provocação, educação, entretenimento).
+
+Por fim, DNA DO MECANISMO: resuma tudo em uma fórmula abstrata única (ex: "Quebra de crença + consequência inesperada + explicação simples + prova + CTA de opinião"). Essa fórmula será usada depois para criar conteúdos originais.`;
+
+const PROMPT_SEO = `Analise o conteúdo e identifique sua oportunidade de descoberta através de mecanismos de busca dentro das plataformas sociais.
+
+Identifique: assunto principal, intenção de busca, palavra-chave principal, palavras-chave secundárias, perguntas relacionadas, problemas relacionados, termos que o público provavelmente pesquisaria, entidades relevantes, termos específicos do nicho, linguagem natural utilizada pelo público.
+
+Depois recomende: KEYWORD PRINCIPAL, 5 KEYWORDS SECUNDÁRIAS, 10 PERGUNTAS QUE O PÚBLICO PODERIA PESQUISAR, TERMOS PARA FALAR NO VÍDEO, TERMOS PARA TEXTO NA TELA, IDEIA DE TÍTULO, IDEIA DE LEGENDA, CTA PARA BUSCA/ENGAJAMENTO, HASHTAGS (não genéricas, priorize relevância contextual).
+
+Diferencie: termos de descoberta, termos de intenção, termos de problema, termos de solução, termos de comparação.
+
+Nunca invente volume de busca. Se não houver dados reais de volume, deixe claro que se trata de recomendação sem validação quantitativa.`;
+
+const PROMPT_IDEIAS = `Você recebeu a análise estratégica (autópsia, DNA e SEO) de um conteúdo que apresentou sinais de alta performance. Sua tarefa é transformar o APRENDIZADO desse conteúdo em novas ideias originais para o briefing fornecido pelo usuário.
+
+NÃO copie frases. NÃO reescreva o conteúdo. NÃO apenas troque algumas palavras. NÃO reproduza a mesma história. Extraia primeiro os mecanismos responsáveis pela estrutura do conteúdo, depois aplique esses mecanismos ao novo contexto (nicho, público, objetivo, posicionamento, tom, produto e tema fornecidos).
+
+Gere pelo menos 6 ideias. Para cada ideia entregue: 1. Título interno, 2. Ângulo, 3. Hook, 4. Promessa, 5. Mecanismo utilizado, 6. Estrutura, 7. Desenvolvimento, 8. CTA, 9. Palavra-chave principal, 10. Potencial de retenção, 11. Potencial de compartilhamento, 12. Potencial de salvamento, 13. Potencial de comentários, 14. Grau de originalidade.
+
+As ideias devem ser claramente diferentes entre si (perspectivas, emoções, formatos, hooks, argumentos, exemplos e narrativas variados). A inspiração deve ser rastreável ao MECANISMO do conteúdo original, mas o resultado final deve ser independente.
+
+Antes de finalizar cada ideia, faça silenciosamente o teste: "Se eu removesse o vídeo original da minha frente, essa ideia ainda pareceria uma criação independente?" Se a resposta for não, reformule antes de entregar.`;
+
+const PROMPT_MATRIZ = `A partir do DNA estratégico identificado (fornecido) e do briefing do usuário, construa uma matriz de possibilidades de conteúdo combinando HOOKS × TEMAS × ÂNGULOS × EMOÇÕES × FORMATOS × PÚBLICOS × OBJETIVOS.
+
+Primeiro gere: 10 novos hooks, 10 novos temas, 10 novos ângulos, 10 novas promessas, 10 formatos, 10 CTAs.
+
+Depois combine esses elementos para gerar ideias de conteúdo específicas, relevantes, diferentes entre si, fáceis de entender e produzir, alinhadas ao público e ao posicionamento, e potencialmente compartilháveis. Evite combinações genéricas.
+
+Quando apropriado, crie exemplos nas categorias: autoridade, viral, educativo, conexão, venda, opinião, storytelling, prova, quebra de objeção.
+
+O objetivo é um sistema de geração contínua de ideias, não uma lista aleatória de posts.`;
+
+const PROMPT_SCORE = `Avalie o potencial estratégico da ideia de conteúdo fornecida, de 0 a 100.
+
+Avalie separadamente: HOOK, RETENÇÃO, CURIOSIDADE, CLAREZA, RELEVÂNCIA, EMOÇÃO, COMPARTILHAMENTO, SALVAMENTO, COMENTÁRIOS, BUSCA, AUTORIDADE, CONVERSÃO, ORIGINALIDADE.
+
+Não utilize apenas uma média simples — pondere de acordo com o OBJETIVO informado:
+- Se VIRALIZAÇÃO: maior peso para Hook, Retenção, Curiosidade, Emoção, Compartilhamento.
+- Se VENDAS: maior peso para Problema, Desejo, Autoridade, Prova, Conversão.
+- Se SEO/DESCOBERTA: maior peso para Busca, Relevância, Clareza, Especificidade.
+
+Entregue: SCORE FINAL (0-100), 3 MAIORES FORÇAS, 3 MAIORES FRAQUEZAS, COMO MELHORAR, e uma VERSÃO OTIMIZADA da ideia (sem alterar sua essência, apenas otimizando a execução).`;
+
+/* ============ STORAGE ============ */
+
+const LS_CONFIG = 'cie_config';
+const LS_ANALYSES = 'cie_analyses';
+
+function loadConfig() {
+  try { return JSON.parse(localStorage.getItem(LS_CONFIG)) || {}; } catch (e) { return {}; }
+}
+function saveConfig(cfg) { localStorage.setItem(LS_CONFIG, JSON.stringify(cfg)); }
+
+function loadAnalyses() {
+  try { return JSON.parse(localStorage.getItem(LS_ANALYSES)) || []; } catch (e) { return []; }
+}
+function saveAnalyses(list) { localStorage.setItem(LS_ANALYSES, JSON.stringify(list)); }
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+
+/* ============ API CALL ============ */
+
+async function callClaude(systemPrompt, userMessage) {
+  const cfg = loadConfig();
+  if (!cfg.apiKey) throw new Error('Configure sua API key na aba "Configuração" antes de continuar.');
+  const model = cfg.model || 'claude-sonnet-5';
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-api-key': cfg.apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: model,
+      max_tokens: 4096,
+      system: PROMPT_SYSTEM_CORE + '\n\n' + systemPrompt,
+      messages: [{ role: 'user', content: userMessage }]
+    })
+  });
+
+  if (!res.ok) {
+    let detail = '';
+    try { const j = await res.json(); detail = j?.error?.message || JSON.stringify(j); } catch (e) { detail = res.statusText; }
+    throw new Error(`Erro da API (${res.status}): ${detail}`);
+  }
+  const data = await res.json();
+  return (data.content || []).map(b => b.text || '').join('\n').trim();
+}
+
+/* ============ MARKDOWN LITE RENDER ============ */
+
+function escapeHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function mdLite(text) {
+  if (!text) return '';
+  const lines = escapeHtml(text).split('\n');
+  let html = '';
+  let listMode = null; // 'ul' | 'ol'
+  const closeList = () => { if (listMode) { html += `</${listMode}>`; listMode = null; } };
+
+  for (let raw of lines) {
+    const line = raw.trim();
+    if (!line) { closeList(); continue; }
+
+    const h = line.match(/^(#{1,4})\s+(.*)$/);
+    if (h) {
+      closeList();
+      const level = Math.min(h[1].length + 1, 4);
+      html += `<h${level}>${inline(h[2])}</h${level}>`;
+      continue;
+    }
+
+    const ul = line.match(/^[-*]\s+(.*)$/);
+    if (ul) {
+      if (listMode !== 'ul') { closeList(); html += '<ul>'; listMode = 'ul'; }
+      html += `<li>${inline(ul[1])}</li>`;
+      continue;
+    }
+
+    const ol = line.match(/^\d+[.)]\s+(.*)$/);
+    if (ol) {
+      if (listMode !== 'ol') { closeList(); html += '<ol>'; listMode = 'ol'; }
+      html += `<li>${inline(ol[1])}</li>`;
+      continue;
+    }
+
+    closeList();
+    html += `<p>${inline(line)}</p>`;
+  }
+  closeList();
+  return html;
+}
+
+function inline(s) {
+  return s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
+}
+
+/* ============ TOAST ============ */
+
+function toast(msg, isError) {
+  const el = document.createElement('div');
+  el.className = 'toast' + (isError ? ' error' : '');
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 5000);
+}
+
+/* ============ TABS ============ */
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('view-' + btn.dataset.view).classList.add('active');
+    if (btn.dataset.view === 'gerar') refreshAnalysisSelect();
+    if (btn.dataset.view === 'banco') renderBank();
+  });
+});
+
+/* ============ CONFIG VIEW ============ */
+
+function refreshConfigStatus() {
+  const cfg = loadConfig();
+  const el = document.getElementById('cfg-status');
+  if (cfg.apiKey) {
+    el.className = 'config-status ok';
+    el.textContent = `Configurado. Modelo atual: ${cfg.model || 'claude-sonnet-5'}`;
+  } else {
+    el.className = 'config-status missing';
+    el.textContent = 'Nenhuma API key salva ainda.';
+  }
+}
+
+document.getElementById('cfg-save').addEventListener('click', () => {
+  const apiKey = document.getElementById('cfg-apikey').value.trim();
+  const model = document.getElementById('cfg-model').value.trim();
+  if (!apiKey) { toast('Cole sua API key antes de salvar.', true); return; }
+  saveConfig({ apiKey, model: model || 'claude-sonnet-5' });
+  document.getElementById('cfg-apikey').value = '';
+  refreshConfigStatus();
+  toast('Configuração salva neste navegador.');
+});
+
+(function initConfigFields() {
+  const cfg = loadConfig();
+  document.getElementById('cfg-model').value = cfg.model || 'claude-sonnet-5';
+  refreshConfigStatus();
+})();
+
+/* ============ ANALISAR VIEW ============ */
+
+const AN_STAGES = [
+  { key: 'transcricao', label: 'Transcrição Estruturada' },
+  { key: 'autopsia', label: 'Autópsia Completa' },
+  { key: 'dna', label: 'DNA Estratégico' },
+  { key: 'seo', label: 'SEO Social' }
+];
+
+function renderStageList(statuses) {
+  const list = document.getElementById('an-stage-list');
+  list.innerHTML = AN_STAGES.map(s => {
+    const st = statuses[s.key] || 'pending';
+    const icon = st === 'done' ? '✔' : st === 'running' ? '…' : st === 'error' ? '✖' : '○';
+    const label = st === 'done' ? 'concluído' : st === 'running' ? 'rodando' : st === 'error' ? 'erro' : 'pendente';
+    return `<div class="stage-row ${st}"><span class="icon">${icon}</span><span class="name">${s.label}</span><span class="status">${label}</span></div>`;
+  }).join('');
+}
+
+function renderAnalysisResults(analysis) {
+  const el = document.getElementById('an-results');
+  const blocks = AN_STAGES.map(s => {
+    const out = analysis.stages[s.key];
+    if (!out) return '';
+    return `<div class="card">
+      <h2>${s.label}</h2>
+      <div class="output-block">${mdLite(out)}</div>
+    </div>`;
+  }).join('');
+  el.innerHTML = blocks;
+}
+
+document.getElementById('an-run').addEventListener('click', async () => {
+  const label = document.getElementById('an-label').value.trim() || 'Análise sem título';
+  const transcript = document.getElementById('an-transcript').value.trim();
+  const context = document.getElementById('an-context').value.trim();
+
+  if (!transcript) { toast('Cole a transcrição do conteúdo antes de rodar.', true); return; }
+  const cfg = loadConfig();
+  if (!cfg.apiKey) { toast('Configure sua API key primeiro (aba Configuração).', true); return; }
+
+  const runBtn = document.getElementById('an-run');
+  runBtn.disabled = true;
+  document.getElementById('an-progress-card').style.display = 'block';
+  document.getElementById('an-results').innerHTML = '';
+
+  const analysis = { id: uid(), createdAt: Date.now(), label, transcript, context, stages: {}, ideas: [], matriz: [] };
+  const statuses = {};
+  renderStageList(statuses);
+
+  const contextLine = context ? `\n\nContexto adicional fornecido pelo usuário: ${context}` : '';
+
+  try {
+    statuses.transcricao = 'running'; renderStageList(statuses);
+    analysis.stages.transcricao = await callClaude(
+      PROMPT_TRANSCRICAO,
+      `Conteúdo a analisar:\n\n${transcript}${contextLine}`
+    );
+    statuses.transcricao = 'done'; renderStageList(statuses);
+    renderAnalysisResults(analysis);
+
+    statuses.autopsia = 'running'; renderStageList(statuses);
+    analysis.stages.autopsia = await callClaude(
+      PROMPT_AUTOPSIA,
+      `Transcrição original:\n\n${transcript}${contextLine}\n\nTranscrição estruturada já produzida:\n\n${analysis.stages.transcricao}`
+    );
+    statuses.autopsia = 'done'; renderStageList(statuses);
+    renderAnalysisResults(analysis);
+
+    statuses.dna = 'running'; renderStageList(statuses);
+    analysis.stages.dna = await callClaude(
+      PROMPT_DNA,
+      `Autópsia do conteúdo:\n\n${analysis.stages.autopsia}`
+    );
+    statuses.dna = 'done'; renderStageList(statuses);
+    renderAnalysisResults(analysis);
+
+    statuses.seo = 'running'; renderStageList(statuses);
+    analysis.stages.seo = await callClaude(
+      PROMPT_SEO,
+      `Conteúdo original:\n\n${transcript}${contextLine}\n\nDNA estratégico já identificado:\n\n${analysis.stages.dna}`
+    );
+    statuses.seo = 'done'; renderStageList(statuses);
+    renderAnalysisResults(analysis);
+
+    const all = loadAnalyses();
+    all.unshift(analysis);
+    saveAnalyses(all);
+    toast('Análise completa salva no Banco de Ideias.');
+  } catch (err) {
+    const currentKey = Object.keys(statuses).find(k => statuses[k] === 'running');
+    if (currentKey) statuses[currentKey] = 'error';
+    renderStageList(statuses);
+    toast(err.message, true);
+    if (Object.keys(analysis.stages).length > 0) {
+      const all = loadAnalyses();
+      all.unshift(analysis);
+      saveAnalyses(all);
+      toast('Progresso parcial salvo no Banco de Ideias mesmo assim.');
+    }
+  } finally {
+    runBtn.disabled = false;
+  }
+});
+
+/* ============ GERAR IDEIAS VIEW ============ */
+
+function refreshAnalysisSelect() {
+  const sel = document.getElementById('gi-analysis');
+  const analyses = loadAnalyses().filter(a => a.stages && a.stages.dna);
+  document.getElementById('gi-analysis-empty').style.display = analyses.length ? 'none' : 'block';
+  sel.innerHTML = analyses.map(a => `<option value="${a.id}">${escapeHtml(a.label)} — ${new Date(a.createdAt).toLocaleDateString('pt-BR')}</option>`).join('');
+}
+
+function getSelectedAnalysis() {
+  const id = document.getElementById('gi-analysis').value;
+  return loadAnalyses().find(a => a.id === id);
+}
+
+function buildBrief() {
+  return {
+    nicho: document.getElementById('gi-nicho').value.trim(),
+    publico: document.getElementById('gi-publico').value.trim(),
+    objetivo: document.getElementById('gi-objetivo').value,
+    tom: document.getElementById('gi-tom').value.trim(),
+    produto: document.getElementById('gi-produto').value.trim(),
+    tema: document.getElementById('gi-tema').value.trim(),
+    posicionamento: document.getElementById('gi-posicionamento').value.trim()
+  };
+}
+
+function briefToText(b) {
+  return `Nicho: ${b.nicho || '(não informado)'}
+Público: ${b.publico || '(não informado)'}
+Objetivo: ${b.objetivo}
+Tom de voz: ${b.tom || '(não informado)'}
+Produto/serviço: ${b.produto || '(não informado)'}
+Tema desejado: ${b.tema || '(livre, use o DNA para sugerir)'}
+Posicionamento: ${b.posicionamento || '(não informado)'}`;
+}
+
+document.getElementById('gi-run').addEventListener('click', async () => {
+  const analysis = getSelectedAnalysis();
+  if (!analysis) { toast('Escolha (ou crie) uma análise primeiro.', true); return; }
+  const btn = document.getElementById('gi-run');
+  btn.disabled = true;
+  document.getElementById('gi-results').innerHTML = '<div class="card"><p class="hint">Gerando ideias...</p></div>';
+  try {
+    const brief = buildBrief();
+    const output = await callClaude(
+      PROMPT_IDEIAS,
+      `DNA estratégico do conteúdo de referência:\n\n${analysis.stages.dna}\n\nSEO social do conteúdo de referência:\n\n${analysis.stages.seo}\n\nBriefing do usuário para as novas ideias:\n\n${briefToText(brief)}`
+    );
+    const record = { id: uid(), createdAt: Date.now(), brief, output };
+    analysis.ideas.unshift(record);
+    const all = loadAnalyses();
+    const idx = all.findIndex(a => a.id === analysis.id);
+    if (idx >= 0) { all[idx] = analysis; saveAnalyses(all); }
+    document.getElementById('gi-results').innerHTML = `<div class="card"><h2>Ideias geradas</h2><div class="output-block">${mdLite(output)}</div></div>`;
+    toast('Ideias geradas e salvas.');
+  } catch (err) {
+    document.getElementById('gi-results').innerHTML = '';
+    toast(err.message, true);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+document.getElementById('gi-run-matriz').addEventListener('click', async () => {
+  const analysis = getSelectedAnalysis();
+  if (!analysis) { toast('Escolha (ou crie) uma análise primeiro.', true); return; }
+  const btn = document.getElementById('gi-run-matriz');
+  btn.disabled = true;
+  document.getElementById('gi-results').innerHTML = '<div class="card"><p class="hint">Gerando matriz de possibilidades...</p></div>';
+  try {
+    const brief = buildBrief();
+    const output = await callClaude(
+      PROMPT_MATRIZ,
+      `DNA estratégico do conteúdo de referência:\n\n${analysis.stages.dna}\n\nBriefing do usuário:\n\n${briefToText(brief)}`
+    );
+    analysis.matriz.unshift({ id: uid(), createdAt: Date.now(), brief, output });
+    const all = loadAnalyses();
+    const idx = all.findIndex(a => a.id === analysis.id);
+    if (idx >= 0) { all[idx] = analysis; saveAnalyses(all); }
+    document.getElementById('gi-results').innerHTML = `<div class="card"><h2>Matriz de Possibilidades</h2><div class="output-block">${mdLite(output)}</div></div>`;
+    toast('Matriz gerada e salva.');
+  } catch (err) {
+    document.getElementById('gi-results').innerHTML = '';
+    toast(err.message, true);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+/* ============ AVALIAR / SCORE VIEW ============ */
+
+document.getElementById('sc-run').addEventListener('click', async () => {
+  const idea = document.getElementById('sc-idea').value.trim();
+  const objetivo = document.getElementById('sc-objetivo').value;
+  if (!idea) { toast('Cole a ideia que você quer avaliar.', true); return; }
+  const btn = document.getElementById('sc-run');
+  btn.disabled = true;
+  document.getElementById('sc-results').innerHTML = '<div class="card"><p class="hint">Calculando score...</p></div>';
+  try {
+    const output = await callClaude(
+      PROMPT_SCORE,
+      `Objetivo informado: ${objetivo}\n\nIdeia de conteúdo a avaliar:\n\n${idea}`
+    );
+    document.getElementById('sc-results').innerHTML = `<div class="card"><h2>Resultado do Score</h2><div class="output-block">${mdLite(output)}</div></div>`;
+
+    // salva o score na última análise usada, se houver, senão cria um registro solto
+    const all = loadAnalyses();
+    if (all.length > 0) {
+      all[0].scores = all[0].scores || [];
+      all[0].scores.unshift({ id: uid(), createdAt: Date.now(), objetivo, ideaText: idea, output });
+      saveAnalyses(all);
+    }
+  } catch (err) {
+    document.getElementById('sc-results').innerHTML = '';
+    toast(err.message, true);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+/* ============ BANCO DE IDEIAS VIEW ============ */
+
+function renderBank() {
+  const query = document.getElementById('bank-search').value.trim().toLowerCase();
+  const analyses = loadAnalyses();
+  const list = document.getElementById('bank-list');
+
+  const filtered = analyses.filter(a => {
+    if (!query) return true;
+    const haystack = [a.label, a.context, ...(a.ideas || []).map(i => i.brief?.nicho + ' ' + i.brief?.tema)].join(' ').toLowerCase();
+    return haystack.includes(query);
+  });
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty-state">Nenhuma análise encontrada ainda. Rode uma na aba "1. Analisar Conteúdo".</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(a => {
+    const stagesDone = Object.keys(a.stages || {}).length;
+    const ideasCount = (a.ideas || []).length;
+    const scoresCount = (a.scores || []).length;
+    const matrizCount = (a.matriz || []).length;
+    return `<div class="analysis-item">
+      <div class="top">
+        <div class="title">${escapeHtml(a.label)}</div>
+        <div class="date">${new Date(a.createdAt).toLocaleString('pt-BR')}</div>
+      </div>
+      <div style="margin-top:8px">
+        <span class="badge">${stagesDone}/4 etapas</span>
+        <span class="badge">${ideasCount} geração(ões) de ideias</span>
+        <span class="badge">${matrizCount} matriz(es)</span>
+        <span class="badge">${scoresCount} score(s)</span>
+      </div>
+      <details class="output-wrap">
+        <summary>Ver detalhes completos</summary>
+        ${AN_STAGES.map(s => a.stages[s.key] ? `<h4 style="color:var(--accent-2);font-size:13px;margin:12px 0 4px">${s.label}</h4><div class="output-block">${mdLite(a.stages[s.key])}</div>` : '').join('')}
+        ${(a.ideas || []).map((i, idx) => `<h4 style="color:var(--accent-2);font-size:13px;margin:12px 0 4px">Ideias geradas #${idx + 1} (${new Date(i.createdAt).toLocaleDateString('pt-BR')})</h4><div class="output-block">${mdLite(i.output)}</div>`).join('')}
+        ${(a.matriz || []).map((m, idx) => `<h4 style="color:var(--accent-2);font-size:13px;margin:12px 0 4px">Matriz #${idx + 1} (${new Date(m.createdAt).toLocaleDateString('pt-BR')})</h4><div class="output-block">${mdLite(m.output)}</div>`).join('')}
+        ${(a.scores || []).map((s, idx) => `<h4 style="color:var(--accent-2);font-size:13px;margin:12px 0 4px">Score #${idx + 1} (${new Date(s.createdAt).toLocaleDateString('pt-BR')})</h4><div class="output-block">${mdLite(s.output)}</div>`).join('')}
+      </details>
+      <button class="btn danger small" style="margin-top:10px" data-delete="${a.id}">Excluir esta análise</button>
+    </div>`;
+  }).join('');
+
+  list.querySelectorAll('[data-delete]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!confirm('Excluir esta análise e tudo que foi gerado a partir dela?')) return;
+      const id = btn.dataset.delete;
+      const remaining = loadAnalyses().filter(a => a.id !== id);
+      saveAnalyses(remaining);
+      renderBank();
+    });
+  });
+}
+
+document.getElementById('bank-search').addEventListener('input', renderBank);
+
+</script>
+</body>
+</html>
