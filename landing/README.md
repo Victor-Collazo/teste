@@ -9,8 +9,11 @@ rápido (HTML único, sem framework).
 
 ## Estrutura
 - `index.html` — página completa (HTML + CSS inline no `<head>`, sem dependências além das Google Fonts)
-- `images/` — fotos do casal usadas no hero, na seção de acompanhamento e no CTA final
+- `images/` — fotos do casal. `hero-wide.jpg` é a foto do hero (veja abaixo); `hero.jpg` é o original em pé, ainda usado em nenhum lugar da página mas mantido caso sirva pra outra coisa; `phones.jpg` e `fun.jpg` seguem nas seções de acompanhamento e CTA final
 - `favicon.svg` — selo "CP" usado como ícone da aba do navegador (mesmo desenho da marca no topo da página)
+
+### `hero-wide.jpg`
+A foto original do hero (`hero.jpg`) é vertical (1200×1800, retrato de estúdio). Para um hero horizontal sem distorcer o casal, `hero-wide.jpg` foi gerado a partir dela: recorte do excesso de fundo branco no topo, e o fundo de estúdio (liso, sem textura) estendido nas duas laterais a partir de uma amostra real da própria borda da foto — sem esticar nem distorcer as pessoas. Resultado: 2680×1500 (~16:9), sem costura visível. Script usado (Pillow) não foi versionado; se precisar refazer com outro recorte, é só pedir.
 
 ## Identidade visual
 - Design escuro e editorial: verde profundo + dourado, inspirado em referências de nutrição/treino premium (selo circular, serifado clássico) e no formato de hero de landing pages fitness de alto padrão (badge + headline grande + dois CTAs)
