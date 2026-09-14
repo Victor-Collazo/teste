@@ -10,13 +10,14 @@ rápido (HTML único, sem framework).
 ## Estrutura
 - `index.html` — página completa (HTML + CSS inline no `<head>`, sem dependências além das Google Fonts)
 - `images/` — fotos do casal usadas no hero, na seção de acompanhamento e no CTA final
+- `favicon.svg` — selo "CP" usado como ícone da aba do navegador (mesmo desenho da marca no topo da página)
 
 ## Identidade visual
 - Design claro e editorial, inspirado em estúdios boutique de alto padrão (Equinox, Solo60, SIX) — clima de "clube privado", não de academia
 - Paleta: papel claro (`#F2EFE6`), branco (`#FFFFFF`), bronze escuro (`#8B5A2E`) — único acento, escolhido escuro o bastante para ter contraste em texto sobre fundo claro
-- Tipografia: Fraunces (títulos serifados, peso 500-600 com itálico em destaque), Manrope (texto corrido), IBM Plex Mono (rótulos, números de protocolo — reforça o tema de acompanhamento/dados)
+- Tipografia: Fraunces (títulos serifados), Manrope (texto corrido), IBM Plex Mono (rótulos, números de protocolo), Bodoni Moda itálico (só no selo "CP" — serifado de alto contraste, mais elegante, ainda legível em 16px)
 - Fotos sem moldura: hero em imagem cheia (edge-to-edge, logo abaixo do bloco de texto), e as demais fotos aparecem soltas na página, só com uma sombra suave para se destacarem do fundo
-- Marca "Consultoria Premium" (selo "CP" + nome) no lugar do nome pessoal no topo da página e no rodapé — "Collazo & Padial" aparece como subtítulo discreto
+- Selo "CP" (bloco bronze sólido, letras em negativo, Bodoni Moda itálico) no lugar do nome pessoal no topo da página, no rodapé e na aba do navegador — "Collazo & Padial" aparece como subtítulo discreto ao lado do nome da marca
 - Sem travessões no texto (preferência do cliente)
 
 ## Decisões de conversão já tomadas
