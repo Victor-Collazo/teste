@@ -13,21 +13,23 @@ rápido (HTML único, sem framework).
 - `favicon.svg` — selo "CP" usado como ícone da aba do navegador (mesmo desenho da marca no topo da página)
 
 ## Identidade visual
-- Design claro e editorial, inspirado em estúdios boutique de alto padrão (Equinox, Solo60, SIX) — clima de "clube privado", não de academia
-- Paleta: papel claro (`#F2EFE6`), branco (`#FFFFFF`), bronze escuro (`#8B5A2E`) — único acento, escolhido escuro o bastante para ter contraste em texto sobre fundo claro
-- Tipografia: Fraunces (títulos serifados), Manrope (texto corrido), IBM Plex Mono (rótulos, números de protocolo), Bodoni Moda itálico (só no selo "CP" — serifado de alto contraste, mais elegante, ainda legível em 16px)
-- Fotos sem moldura: hero em imagem cheia (edge-to-edge, logo abaixo do bloco de texto), e as demais fotos aparecem soltas na página, só com uma sombra suave para se destacarem do fundo
-- Selo "CP" (bloco bronze sólido, letras em negativo, Bodoni Moda itálico) no lugar do nome pessoal no topo da página, no rodapé e na aba do navegador — "Collazo & Padial" aparece como subtítulo discreto ao lado do nome da marca
+- Design escuro e editorial: verde profundo + dourado, inspirado em referências de nutrição/treino premium (selo circular, serifado clássico) e no formato de hero de landing pages fitness de alto padrão (badge + headline grande + dois CTAs)
+- Paleta: verde escuro (`#10301D`), verde-oliva mais claro para faixas alternadas (`#17381F`), creme (`#F3EEDD` — só no cartão de oferta, como "plano em destaque"), dourado (`#C9A24B`) como único acento
+- Tipografia: só duas famílias — Bodoni Moda (títulos serifados de alto contraste, itálico para ênfase e para o selo "CP") e Manrope (texto corrido, rótulos, botões). Fraunces e IBM Plex Mono foram removidos para simplificar.
+- Hero em foto cheia (edge-to-edge) com o texto sobreposto: a foto recebe um tingimento verde-escuro (filtro + camada multiply) forte o bastante para o texto ficar legível em qualquer ponto da imagem, não só numa faixa de gradiente
+- Fotos de apoio (acompanhamento, CTA final) sem moldura pesada — só um fio dourado sutil e sombra, para não competir com o fundo escuro
+- Selo "CP" (bloco dourado sólido, letras em negativo, Bodoni Moda itálico) no nav, rodapé e na aba do navegador
 - Sem travessões no texto (preferência do cliente)
 
 ## Decisões de conversão já tomadas
-- **CTA único**: todos os botões (nav, hero, meio de página, oferta, final) levam para o mesmo WhatsApp — sem formulário de lead, sem menu de navegação, sem links de Instagram no rodapé.
-- **Preço**: mostra só o valor de entrada (R$397 / 45 dias) como âncora; os planos mais longos são combinados no próprio WhatsApp, para não travar a decisão numa tabela grande.
+- **CTA duplo no hero**: botão principal (dourado, para o WhatsApp) + botão secundário fantasma ("Como funciona", rola até a seção de método) — o resto da página mantém CTA único pro WhatsApp.
+- **Copy enxuta**: bullets de cada especialista reduzidos a 3 itens, quebra de objeções reduzida a 3 perguntas com respostas de 1 frase, textos de apoio mais curtos — menos texto, mesma estrutura de convite à conversão.
+- **Preço**: mostra só o valor de entrada (R$397 / 45 dias) como âncora, em um cartão creme que se destaca do resto da página (como o plano "em destaque" da referência); planos mais longos são combinados no WhatsApp.
 - **Garantia**: ajuste ilimitado do protocolo até o fim do período, sem custo extra (compromisso real, não reembolso).
 
 ## Pendências conhecidas
-- **Depoimento/prova social real**: a seção de garantia hoje é uma promessa da marca, não um depoimento — falta um depoimento ou fotos reais de aluno para reforçar prova social. Fotos foram prometidas e ainda não chegaram.
-- **CREF/CRN reais**: hero ainda mostra "CREF" / "CRN" genérico; números reais foram prometidos e ainda não chegaram.
+- **Depoimento/prova social real**: a seção de garantia hoje é uma promessa da marca, não um depoimento — falta um depoimento ou fotos reais de aluno. Fotos foram prometidas e ainda não chegaram.
+- **CREF/CRN**: não aparecem mais no hero (cortados na limpeza de informação); se quiser reforçar autoridade, dá pra reintroduzir como uma linha pequena perto do nome de cada um na seção "O que você recebe".
 - **Velocidade/hospedagem**: página já é leve (HTML único + 3 fotos + Google Fonts), mas para tráfego pago vale comprimir as imagens antes de publicar e usar hospedagem com CDN.
 
 ## Como rodar localmente
