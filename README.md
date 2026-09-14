@@ -43,6 +43,17 @@ A página inteira (os dois espaços) fica atrás de uma tela de login. Usuário 
 
 Importante: esse login é só uma trava simples no navegador (não existe servidor por trás). Ele impede que alguém abra a página por acidente, mas **não é uma proteção de verdade** — qualquer pessoa que veja o código-fonte da página encontra a senha. Antes de publicar este link para acesso externo com dados reais de pacientes, vale a pena migrar para uma autenticação de verdade (com backend).
 
-## Dados
+## Dados e sincronização
 
-Os dados de cada espaço ficam salvos separadamente no `localStorage` do navegador usado — não há backend nem conta. Isso significa que a lista não sincroniza entre dispositivos ou navegadores diferentes; ela persiste no mesmo navegador entre sessões.
+A ferramenta está publicada como um Artifact do Claude (link fixo, sempre "online" — não depende do seu navegador estar aberto). Quanto a onde os dados ficam salvos, a página tenta duas camadas, nessa ordem:
+
+1. **Banco de dados do Artifact (nuvem).** Se o link for aberto por alguém logado no claude.ai e que faça parte da mesma organização de quem publicou a página, os dados de cada espaço (Treinador/Nutricionista) são salvos num banco compartilhado e sincronizados em tempo real entre qualquer aparelho/navegador que abrir o link — exatamente o que evita perder aluno. Um indicador no rodapé da página mostra **"Sincronizado na nuvem"** quando isso está ativo.
+2. **`localStorage` do navegador (local).** Se quem abrir não estiver logado no claude.ai ou não fizer parte dessa organização, a nuvem fica indisponível e a página cai automaticamente para salvar só naquele navegador — o indicador do rodapé muda para **"Salvando apenas neste navegador"**. Nesse caso os dados não somem, mas também não aparecem em outro aparelho.
+
+Na primeira vez que a nuvem fica disponível num navegador que já tinha alunos/pacientes salvos localmente, esses registros são copiados automaticamente para o banco — nada se perde na migração.
+
+**Backup manual (funciona sempre, com ou sem nuvem):** os botões **"Exportar backup"** e **"Importar backup"**, ao lado de "Adicionar aluno/paciente", salvam ou recarregam a lista da aba atual como um arquivo `.json`. Vale usar isso de vez em quando como segurança extra, independente da sincronização.
+
+### Se a Gabi não conseguir ver os dados sincronizados
+
+Isso quer dizer que o navegador dela não está sendo reconhecido como parte da sua organização no claude.ai — o requisito da Anthropic para esse banco de dados compartilhado. Nesse caso, cada um continua salvando localmente (sem perda, só sem sincronizar), e o backup manual (exportar/importar) é o jeito de levar os dados de um aparelho para o outro enquanto isso não for resolvido.

@@ -191,6 +191,7 @@
     text-transform: uppercase;
     margin: 0;
   }
+  .view-header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
   .btn {
     font-family: inherit;
@@ -542,11 +543,30 @@
   .login-error { color: var(--danger); font-size: 12.5px; margin: 10px 0 0; }
 
   footer.note {
-    margin-top: 32px;
+    margin-top: 8px;
     color: var(--muted);
     font-size: 12px;
     max-width: 68ch;
   }
+
+  .sync-status {
+    margin: 32px 0 0;
+    font-size: 12.5px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+  }
+  .sync-status::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .sync-status.synced { color: var(--good); }
+  .sync-status.local { color: var(--warn); }
 </style>
 
 <div id="appShell" hidden>
@@ -575,7 +595,12 @@
   <main class="main">
     <div class="view-header">
       <h2 class="view-title" id="viewHeading">Alunos</h2>
-      <button class="btn" id="openAdd">+ Adicionar aluno</button>
+      <div class="view-header-actions">
+        <button type="button" class="btn ghost small" id="exportData">Exportar backup</button>
+        <button type="button" class="btn ghost small" id="importData">Importar backup</button>
+        <input type="file" id="importFile" accept="application/json" hidden>
+        <button class="btn" id="openAdd">+ Adicionar aluno</button>
+      </div>
     </div>
 
     <section id="viewAlunos">
@@ -609,7 +634,8 @@
       <div class="kanban-board" id="kanbanBoard"></div>
     </section>
 
-    <footer class="note">Cada espaço (Treinador / Nutricionista) guarda seus próprios dados, separadamente, neste navegador. O acesso a esta página inteira pede usuário e senha — mas é apenas uma trava simples no navegador (sem servidor). Antes de publicar esta página para acesso externo, vale reforçar com um controle de acesso de verdade, já que envolve dados de pacientes.</footer>
+    <p class="sync-status" id="syncStatus">Verificando sincronização…</p>
+    <footer class="note">Cada espaço (Treinador / Nutricionista) guarda seus próprios dados, separadamente. O acesso a esta página inteira pede usuário e senha — mas é apenas uma trava simples no navegador (sem servidor). Antes de publicar esta página para acesso externo, vale reforçar com um controle de acesso de verdade, já que envolve dados de pacientes.</footer>
   </main>
 </div>
 </div>
@@ -867,15 +893,99 @@
   function unlockApp() { localStorage.setItem(UNLOCK_KEY, "1"); }
   function lockApp() { localStorage.removeItem(UNLOCK_KEY); }
 
+  /* ---- Storage backend: the artifact's cloud database when this viewer
+     can reach it (signed in to claude.ai, same organization as whoever
+     published the page), otherwise this browser's localStorage. Cloud
+     writes also keep a local copy, so a device that later can't reach
+     the cloud still has the last-known data. Design-for-absence: the
+     page renders instantly from local data, then quietly upgrades to
+     live cloud sync if/when it becomes available. ---- */
+
+  var dbApi = null;
+  var records = [];
+  var currentStore = null;
+
+  function onRecordsChanged(newRecords) {
+    records = newRecords;
+    render();
+    if (currentTab === "kanban") renderKanban();
+  }
+
+  function makeLocalStore(workspaceId) {
+    return {
+      init: function (onChange) {
+        onChange(loadRecords(workspaceId));
+      },
+      upsert: function (record) {
+        var list = loadRecords(workspaceId);
+        var idx = list.findIndex(function (r) { return r.id === record.id; });
+        if (idx >= 0) list[idx] = record; else list.push(record);
+        saveRecords(workspaceId, list);
+        onRecordsChanged(list);
+        return Promise.resolve();
+      },
+      remove: function (id) {
+        var list = loadRecords(workspaceId).filter(function (r) { return r.id !== id; });
+        saveRecords(workspaceId, list);
+        onRecordsChanged(list);
+        return Promise.resolve();
+      },
+      teardown: function () {}
+    };
+  }
+
+  function makeDbStore(workspaceId) {
+    var col = dbApi.collection("records/" + workspaceId + "/items");
+    var unsubscribe = null;
+    return {
+      init: function (onChange) {
+        unsubscribe = col.onSnapshot(function (snap) {
+          var list = snap.docs.map(function (d) {
+            return Object.assign({ id: d.id }, d.data());
+          });
+          saveRecords(workspaceId, list);
+          onChange(list);
+        }, function (err) {
+          console.warn("Sincronização em nuvem indisponível agora; usando dados locais.", err);
+        });
+      },
+      upsert: function (record) {
+        var data = Object.assign({}, record);
+        delete data.id;
+        return col.doc(record.id).set(data);
+      },
+      remove: function (id) {
+        return col.doc(id).delete();
+      },
+      teardown: function () {
+        if (unsubscribe) unsubscribe();
+      }
+    };
+  }
+
+  function setActiveStore(workspaceId) {
+    if (currentStore) currentStore.teardown();
+    currentStore = dbApi ? makeDbStore(workspaceId) : makeLocalStore(workspaceId);
+    currentStore.init(onRecordsChanged);
+  }
+
+  function seedDbFromLocal(workspaceId) {
+    var col = dbApi.collection("records/" + workspaceId + "/items");
+    return col.get().then(function (snap) {
+      if (!snap.empty) return;
+      var local = loadRecords(workspaceId);
+      return Promise.all(local.map(function (r) {
+        var data = Object.assign({}, r);
+        delete data.id;
+        return col.doc(r.id).set(data);
+      }));
+    }).catch(function () {});
+  }
+
   migrateLegacyData();
   var uiState = loadUIState();
   var currentWorkspace = uiState.workspace === "gabi" ? "gabi" : "victor";
   var currentTab = uiState.tab === "kanban" ? "kanban" : "alunos";
-  var records = loadRecords(currentWorkspace);
-
-  function persist() {
-    saveRecords(currentWorkspace, records);
-  }
 
   function populatePlanSelect(selectEl, workspaceId) {
     var cfg = CONFIG[workspaceId];
@@ -1033,17 +1143,18 @@
     document.getElementById("viewKanban").hidden = currentTab !== "kanban";
     document.getElementById("viewHeading").textContent = currentTab === "alunos" ? cfg.personCapPlural : "Acompanhamento";
     document.getElementById("openAdd").hidden = currentTab !== "alunos";
+    document.getElementById("exportData").hidden = currentTab !== "alunos";
+    document.getElementById("importData").hidden = currentTab !== "alunos";
   }
 
   function switchWorkspace(id) {
     if (id === currentWorkspace || !CONFIG[id]) return;
     currentWorkspace = id;
-    records = loadRecords(currentWorkspace);
     uiState.workspace = id;
     saveUIState(uiState);
     refreshChrome();
     applyTabUI();
-    render();
+    setActiveStore(currentWorkspace);
     renderKanban();
   }
 
@@ -1313,11 +1424,9 @@
   /* ---- Kanban ---- */
 
   function moveRecordToStage(id, stageKey) {
-    records = records.map(function (r) {
-      return r.id === id ? Object.assign({}, r, { stage: stageKey }) : r;
-    });
-    persist();
-    renderKanban();
+    var record = records.find(function (r) { return r.id === id; });
+    if (!record) return;
+    currentStore.upsert(Object.assign({}, record, { stage: stageKey }));
   }
 
   function kanbanCardTreino(s) {
@@ -1436,6 +1545,73 @@
     if (parseInt(protocolNumberInput.value, 10) > max) protocolNumberInput.value = max;
   });
 
+  /* ---- Manual backup (export/import): works everywhere, regardless of
+     whether cloud sync is available, as a safety net against data loss. ---- */
+
+  document.getElementById("exportData").addEventListener("click", function () {
+    var cfg = CONFIG[currentWorkspace];
+    var json = JSON.stringify(records, null, 2);
+    var filename = "backup-" + cfg.person + "s-" + toInputValue(todayStart()) + ".json";
+
+    function fallbackDownload() {
+      var blob = new Blob([json], { type: "application/json" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    if (window.claude && window.claude.use) {
+      // Inside the published viewer, a plain link download is blocked by the
+      // sandbox — go through the downloads capability instead of faking a click.
+      window.claude.use("downloads").then(function (downloads) {
+        if (!downloads) { alert("Exportação indisponível neste momento."); return; }
+        return downloads.save({ filename: filename, data: json }).catch(function (err) {
+          if (err && err.code !== "declined") alert("Não foi possível exportar agora. Tente novamente em instantes.");
+        });
+      }).catch(function () {
+        alert("Não foi possível exportar agora. Tente novamente em instantes.");
+      });
+    } else {
+      // Opened as a local file outside the viewer sandbox — a plain download works.
+      fallbackDownload();
+    }
+  });
+
+  document.getElementById("importData").addEventListener("click", function () {
+    document.getElementById("importFile").click();
+  });
+
+  document.getElementById("importFile").addEventListener("change", function (e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var imported;
+      try {
+        imported = JSON.parse(reader.result);
+      } catch (err) {
+        alert("Arquivo inválido: não é um backup JSON reconhecível.");
+        return;
+      }
+      if (!Array.isArray(imported)) {
+        alert("Arquivo inválido: o backup precisa ser uma lista.");
+        return;
+      }
+      var cfg = CONFIG[currentWorkspace];
+      if (!confirm("Importar " + imported.length + " registro(s) para \"" + cfg.personCapPlural + "\"? Um registro existente com o mesmo id será substituído; os demais são mantidos.")) return;
+      imported.forEach(function (record) {
+        if (record && record.id) currentStore.upsert(record);
+      });
+      e.target.value = "";
+    };
+    reader.readAsText(file);
+  });
+
   document.getElementById("openAdd").addEventListener("click", function () {
     var cfg = CONFIG[currentWorkspace];
     form.reset();
@@ -1499,15 +1675,8 @@
       };
     }
 
-    if (id) {
-      records = records.map(function (r) { return r.id === id ? record : r; });
-    } else {
-      records.push(record);
-    }
-    persist();
+    currentStore.upsert(record);
     dialog.close();
-    render();
-    if (currentTab === "kanban") renderKanban();
   });
 
   document.getElementById("listWrap").addEventListener("click", function (e) {
@@ -1519,9 +1688,7 @@
 
     if (action === "delete") {
       if (confirm("Excluir este " + cfg.person + " da lista?")) {
-        records = records.filter(function (r) { return r.id !== id; });
-        persist();
-        render();
+        currentStore.remove(id);
       }
     } else if (action === "edit") {
       var r = records.find(function (x) { return x.id === id; });
@@ -1571,17 +1738,14 @@
     e.preventDefault();
     var id = document.getElementById("swapId").value;
     var date = document.getElementById("swapDate").value;
-    records = records.map(function (s) {
-      if (s.id !== id) return s;
-      return Object.assign({}, s, {
+    var s = records.find(function (r) { return r.id === id; });
+    if (s) {
+      currentStore.upsert(Object.assign({}, s, {
         protocolNumber: s.protocolNumber + 1,
         protocolStart: date
-      });
-    });
-    persist();
+      }));
+    }
     document.getElementById("swapDialog").close();
-    render();
-    if (currentTab === "kanban") renderKanban();
   });
 
   document.getElementById("search").addEventListener("input", render);
@@ -1591,8 +1755,34 @@
 
   refreshChrome();
   applyTabUI();
-  render();
+  setActiveStore(currentWorkspace);
   renderKanban();
+
+  function setSyncStatus(text, cls) {
+    var el = document.getElementById("syncStatus");
+    el.textContent = text;
+    el.className = "sync-status" + (cls ? " " + cls : "");
+  }
+
+  (function initCloudSync() {
+    if (!window.claude || !window.claude.use) {
+      setSyncStatus("Salvando apenas neste navegador (arquivo aberto fora do link publicado).", "local");
+      return;
+    }
+    window.claude.use("db").then(function (api) {
+      if (!api) {
+        setSyncStatus("Salvando apenas neste navegador — sincronização em nuvem indisponível aqui.", "local");
+        return;
+      }
+      dbApi = api;
+      return Promise.all([seedDbFromLocal("victor"), seedDbFromLocal("gabi")]).then(function () {
+        setActiveStore(currentWorkspace);
+        setSyncStatus("Sincronizado na nuvem — visível em qualquer aparelho conectado.", "synced");
+      });
+    }).catch(function () {
+      setSyncStatus("Salvando apenas neste navegador — sincronização em nuvem indisponível aqui.", "local");
+    });
+  })();
 
   if (isAppUnlocked()) {
     document.getElementById("loginOverlay").hidden = true;
